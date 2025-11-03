@@ -25,7 +25,7 @@ public class ZorkULGame {
     }
 
     private void createRooms() {
-        Room outside, theatre, pub, lab, office, classRoom;
+        Room outside, theatre, pub, lab, office, classRoom, brownThomas;
 
         // create rooms
         outside = new Room("outside the main entrance of the university");
@@ -33,15 +33,19 @@ public class ZorkULGame {
         pub = new Room("in the campus pub");
         lab = new Room("in a computing lab");
         office = new Room("in the computing admin office");
-         classRoom = new Room("in the classroom");
+        classRoom = new Room("in the classroom");
+        brownThomas = new Room("You are on a room alone with the icocnic Brown Thomas Statue");
 
         // initialise room exits
         outside.setExit("east", theatre);
         outside.setExit("south", lab);
         outside.setExit("west", pub);
+        outside.setExit("north", brownThomas);
 
         theatre.setExit("west", outside);
         theatre.setExit("east", classRoom);
+
+        brownThomas.setExit("south", outside);
 
         pub.setExit("east", outside);
 
@@ -53,6 +57,7 @@ public class ZorkULGame {
 
         classRoom.setExit("west", theatre);
         classRoom.setExit("south", office);
+
 
 
         // create the player character and start outside
