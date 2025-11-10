@@ -5,13 +5,28 @@ import java.util.ArrayList;
 public class Room {
     private String description;
     private Map<String, Room> exits; // Map direction to neighboring Room
-    private ArrayList<Item> items;
+    private ArrayList<Item> items; //items
+    private Map<String, Double> foodMenu; //menu
 
     public Room(String description) {
         this.description = description;
         exits = new HashMap<>();
         items = new ArrayList<>();
+        foodMenu = new HashMap<>();
     }
+    public void addMenuOption(String itemName, double price) {
+        foodMenu.put(itemName, price);
+    }
+    public void DisplayMenu() {
+        System.out.println("Available options:");
+            for (Map.Entry<String, Double> entry : foodMenu.entrySet()) {
+            String name = entry.getKey();    // burger name
+            Double price = entry.getValue(); // burger price
+            System.out.println(name + ": $" + price);
+        }
+        System.out.println();
+    }
+    
 
     public String getDescription() {
         return description;
@@ -42,8 +57,8 @@ public class Room {
     }
     /**
      * Removes an item from this room by name
-     * @param itemName The name of the item to remove
-     * @return The removed item, or null if not found
+     * param itemName The name of the item to remove
+     * return The removed item, or null if not found
      */
     public Item removeItem(String itemName) {
         for (Item item : items) {

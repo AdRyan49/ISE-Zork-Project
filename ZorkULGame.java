@@ -32,25 +32,29 @@ public class ZorkULGame {
         Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas;
 
         // create rooms
-        outside = new Room("outside the main entrance of the university");
-        Coqbul = new Room("in a lecture Coqbul");
-        SuperMacs = new Room("in the campus SuperMacs");
-        lockeBurger = new Room("in a computing lockeBurger");
-        burgerMac = new Room("in the computing admin burgerMac");
-        SomeDodgeyChipper = new Room("in the SomeDodgeyChipper");
-        brownThomas = new Room("You are on a room alone with the icocnic Brown Thomas Statue");
+        outside = new Room("Your outide, the restaurants are waiting to serve you.");
+        Coqbul = new Room("Welcome to Coqbul Eatery—where the chicken is confused and so are you.");
+        SuperMacs = new Room("Inside SuperMacs Diner. The fries here are almost as salty as the staff's jokes.");
+        lockeBurger = new Room("At LockeBurger Bistro, where the burgers are deep and the thoughts are deeper.");
+        burgerMac = new Room("You've entered Burger Mac Shack. The cook hasn't left the grill since 1997.");
+        SomeDodgeyChipper = new Room("Welcome to Some Dodgey Chipper. The mystery meat is half the fun.");
+        brownThomas = new Room("Alone by the legendary Brown Thomas Statue. Even the pigeons eye your snacks.");
 
+         // Set up food menus for each room
+        outside.addMenuOption("Cheeseburger", 5.99);
+        outside.addMenuOption("Veggie Burger", 4.49);
+
+        Coqbul.addMenuOption("Double Burger", 7.99);
+        Coqbul.addMenuOption("Chicken Burger", 6.49);
+
+        SuperMacs.addMenuOption("Fish Burger", 5.49);
+        SuperMacs.addMenuOption("Spicy Burger", 6.99);
         //Creat items
-        Item key = new Item("key", "a rusty old key");
-        Item book = new Item("book", "a thick Java programming book");
-        Item laptop = new Item("laptop", "a modern laptop computer");
-        Item mug = new Item("mug", "a coffee mug with university logo");
-
+        Item key = new Item("Coupon", "a cheeky discount coupon for your next meal");
+        
         // Place items 
         outside.addItem(key);
-        Coqbul.addItem(book);
-        lockeBurger.addItem(laptop);
-        SuperMacs.addItem(mug);
+        
 
         // initialise room exits
         outside.setExit("east", Coqbul);
@@ -124,36 +128,38 @@ public class ZorkULGame {
                  
                 break;
             case "take":  // Handle take command
-    if (command.hasSecondWord()) {
-        String itemName = command.getSecondWord();
-        if (player.takeItem(player.getCurrentRoom(), itemName)) {
-            System.out.println("You picked up: " + itemName);
-        } else {
-            System.out.println("That item is not here!");
-        }
-    } else {
-        System.out.println("Take what?");
-    }
-    break;
-
-    case "drop":  // Handle drop command
-        if (command.hasSecondWord()) {
-            String itemName = command.getSecondWord();
-            if (player.dropItem(player.getCurrentRoom(), itemName)) {
-                System.out.println("You dropped: " + itemName);
+            if (command.hasSecondWord()) {
+                String itemName = command.getSecondWord();
+                if (player.takeItem(player.getCurrentRoom(), itemName)) {
+                    System.out.println("You picked up: " + itemName);
+                } else {
+                    System.out.println("That item is not here!");
+                }
             } else {
-                System.out.println("You don't have that item!");
+                System.out.println("Take what?");
             }
-        } else {
-            System.out.println("Drop what?");
-        }
-        break;
+            break;
 
-case "inventory":  // Handle inventory command
-    System.out.println(player.getInventoryString());
-    break;
+            case "drop":  // Handle drop command
+                if (command.hasSecondWord()) {
+                    String itemName = command.getSecondWord();
+                    if (player.dropItem(player.getCurrentRoom(), itemName)) {
+                        System.out.println("You dropped: " + itemName);
+                    } else {
+                        System.out.println("You don't have that item!");
+                    }
+                } else {
+                    System.out.println("Drop what?");
+                }
+                break;
 
-            
+            case "inventory":  // Handle inventory command
+                System.out.println(player.getInventoryString());
+                break;
+
+            case "Menu":
+                player.getCurrentRoom().DisplayMenu();
+                break;
                 
             case "quit":
                 if (command.hasSecondWord()) {
