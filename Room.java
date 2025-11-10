@@ -1,13 +1,16 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class Room {
     private String description;
     private Map<String, Room> exits; // Map direction to neighboring Room
+    private ArrayList<Item> items;
 
     public Room(String description) {
         this.description = description;
         exits = new HashMap<>();
+        items = new ArrayList<>();
     }
 
     public String getDescription() {
@@ -29,8 +32,47 @@ public class Room {
         }
         return sb.toString().trim();
     }
+    
+    /**
+     * Adds an item to this room
+     * param item The item to add
+     */
+    public void addItem(Item item) {
+        items.add(item);
+    }
+    /**
+     * Removes an item from this room by name
+     * @param itemName The name of the item to remove
+     * @return The removed item, or null if not found
+     */
+    public Item removeItem(String itemName) {
+        for (Item item : items) {
+            if (item.getName().equalsIgnoreCase(itemName)) {
+                items.remove(item);
+                return item;
+            }
+        }
+        return null;  // Item not found
+    }
+     /**
+     * Returns a formatted string of all items in this room
+     * return String listing all items, or "none" if empty
+     */
+    public String getItemsString() {
+        if (items.isEmpty()) {
+            return "none";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Item item : items) {
+            sb.append(item.getName()).append(", ");
+        }
+        // Remove trailing comma and space
+        return sb.substring(0, sb.length() - 2);
+    }
+
 
     public String getLongDescription() {
-        return "You are " + description + ".\nExits: " + getExitString();
+        return "You are " + description + ".\nExits: " + getExitString() 
+               + "\nItems: " + getItemsString();  //Add items to description
     }
 }

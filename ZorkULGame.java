@@ -18,10 +18,14 @@ import java.util.Scanner;
 public class ZorkULGame {
     private Parser parser;
     private Character player;
+    private int moveCount;
+    private int energyLevel;
 
     public ZorkULGame() {
         createRooms();
         parser = new Parser();
+        moveCount = 0;
+        energyLevel = 50;
     }
 
     private void createRooms() {
@@ -35,6 +39,18 @@ public class ZorkULGame {
         office = new Room("in the computing admin office");
         classRoom = new Room("in the classroom");
         brownThomas = new Room("You are on a room alone with the icocnic Brown Thomas Statue");
+
+        //Creat items
+        Item key = new Item("key", "a rusty old key");
+        Item book = new Item("book", "a thick Java programming book");
+        Item laptop = new Item("laptop", "a modern laptop computer");
+        Item mug = new Item("mug", "a coffee mug with university logo");
+
+        // Place items 
+        outside.addItem(key);
+        theatre.addItem(book);
+        lab.addItem(laptop);
+        pub.addItem(mug);
 
         // initialise room exits
         outside.setExit("east", theatre);
@@ -90,14 +106,60 @@ public class ZorkULGame {
             System.out.println("I don't understand your command...");
             return false;
         }
-
+        
         switch (commandWord) {
             case "help":
                 printHelp();
                 break;
             case "go":
                 goRoom(command);
+                moveCount++;
+                energyLevel = energyLevel - 5;
+                if(energyLevel <= 0) {
+                    System.out.println("You have run out of energy and DIED. better luck next time!");
+                    return true; // End the game
+                }
+                System.out.println("Energy level");
+                String bar = "[" +"*".repeat(energyLevel)+ "]";
+                if(energyLevel != 50){
+                    int goneEnergy = (50 - energyLevel);
+                    bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
+                }
+                System.out.println("["+bar+"]");
+                 
                 break;
+            case "take":  // Handle take command
+    if (command.hasSecondWord()) {
+        String itemName = command.getSecondWord();
+        if (player.takeItem(player.getCurrentRoom(), itemName)) {
+            System.out.println("You picked up: " + itemName);
+        } else {
+            System.out.println("That item is not here!");
+        }
+    } else {
+        System.out.println("Take what?");
+    }
+    break;
+
+    case "drop":  // Handle drop command
+        if (command.hasSecondWord()) {
+            String itemName = command.getSecondWord();
+            if (player.dropItem(player.getCurrentRoom(), itemName)) {
+                System.out.println("You dropped: " + itemName);
+            } else {
+                System.out.println("You don't have that item!");
+            }
+        } else {
+            System.out.println("Drop what?");
+        }
+        break;
+
+case "inventory":  // Handle inventory command
+    System.out.println(player.getInventoryString());
+    break;
+
+            
+                
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
@@ -116,6 +178,7 @@ public class ZorkULGame {
         System.out.println("You are lost. You are alone. You wander around the university.");
         System.out.print("Your command words are: ");
         parser.showCommands();
+        System.out.println(moveCount);
     }
 
     private void goRoom(Command command) {
