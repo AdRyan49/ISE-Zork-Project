@@ -1,6 +1,6 @@
 /* This game is a classic text-based adventure set in a university environment.
    The player starts outside the main entrance and can navigate through different rooms like a 
-   lecture theatre, campus pub, computing lab, and admin office using simple text commands (e.g., "go east", "go west").
+   lecture Coqbul, campus SuperMacs, computing lockeBurger, and admin burgerMac using simple text commands (e.g., "go east", "go west").
     The game provides descriptions of each location and lists possible exits.
 
 Key features include:
@@ -29,15 +29,15 @@ public class ZorkULGame {
     }
 
     private void createRooms() {
-        Room outside, theatre, pub, lab, office, classRoom, brownThomas;
+        Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas;
 
         // create rooms
         outside = new Room("outside the main entrance of the university");
-        theatre = new Room("in a lecture theatre");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
-        classRoom = new Room("in the classroom");
+        Coqbul = new Room("in a lecture Coqbul");
+        SuperMacs = new Room("in the campus SuperMacs");
+        lockeBurger = new Room("in a computing lockeBurger");
+        burgerMac = new Room("in the computing admin burgerMac");
+        SomeDodgeyChipper = new Room("in the SomeDodgeyChipper");
         brownThomas = new Room("You are on a room alone with the icocnic Brown Thomas Statue");
 
         //Creat items
@@ -48,31 +48,31 @@ public class ZorkULGame {
 
         // Place items 
         outside.addItem(key);
-        theatre.addItem(book);
-        lab.addItem(laptop);
-        pub.addItem(mug);
+        Coqbul.addItem(book);
+        lockeBurger.addItem(laptop);
+        SuperMacs.addItem(mug);
 
         // initialise room exits
-        outside.setExit("east", theatre);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
+        outside.setExit("east", Coqbul);
+        outside.setExit("south", lockeBurger);
+        outside.setExit("west", SuperMacs);
         outside.setExit("north", brownThomas);
 
-        theatre.setExit("west", outside);
-        theatre.setExit("east", classRoom);
+        Coqbul.setExit("west", outside);
+        Coqbul.setExit("east", SomeDodgeyChipper);
 
         brownThomas.setExit("south", outside);
 
-        pub.setExit("east", outside);
+        SuperMacs.setExit("east", outside);
 
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
+        lockeBurger.setExit("north", outside);
+        lockeBurger.setExit("east", burgerMac);
 
-        office.setExit("west", lab);
-        office.setExit("north", classRoom);
+        burgerMac.setExit("west", lockeBurger);
+        burgerMac.setExit("north", SomeDodgeyChipper);
 
-        classRoom.setExit("west", theatre);
-        classRoom.setExit("south", office);
+        SomeDodgeyChipper.setExit("west", Coqbul);
+        SomeDodgeyChipper.setExit("south", burgerMac);
 
 
 
