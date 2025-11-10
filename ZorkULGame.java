@@ -119,13 +119,8 @@ public class ZorkULGame {
                     System.out.println("You have run out of energy and DIED. better luck next time!");
                     return true; // End the game
                 }
-                System.out.println("Energy level");
-                String bar = "[" +"*".repeat(energyLevel)+ "]";
-                if(energyLevel != 50){
-                    int goneEnergy = (50 - energyLevel);
-                    bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
-                }
-                System.out.println("["+bar+"]");
+                displatEnergyBar();
+                
                  
                 break;
             case "take":  // Handle take command
@@ -173,6 +168,16 @@ case "inventory":  // Handle inventory command
         }
         return false;
     }
+    //enerrgy bar method
+    private void displatEnergyBar(){
+        System.out.println("Energy level");
+                String bar = "[" +"*".repeat(energyLevel)+ "]";
+                if(energyLevel != 50){
+                    int goneEnergy = (50 - energyLevel);
+                    bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
+                }
+                System.out.println("["+bar+"]");
+    }
 
     private void printHelp() {
         System.out.println("You are lost. You are alone. You wander around the university.");
@@ -198,6 +203,7 @@ case "inventory":  // Handle inventory command
             System.out.println(player.getCurrentRoom().getLongDescription());
         }
     }
+   
 
     public static void main(String[] args) {
         ZorkULGame game = new ZorkULGame();
