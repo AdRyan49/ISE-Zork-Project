@@ -20,12 +20,14 @@ public class ZorkULGame {
     private Character player;
     private int moveCount;
     private int energyLevel;
+    private int hungerLevel;
 
     public ZorkULGame() {
         createRooms();
         parser = new Parser();
         moveCount = 0;
         energyLevel = 50;
+        hungerLevel = 50; // initial hunger level
     }
 
     private void createRooms() {
@@ -33,7 +35,7 @@ public class ZorkULGame {
 
         // create rooms
         outside = new Room("Your outide, the restaurants are waiting to serve you.");
-        Coqbul = new Room("Welcome to Coqbul Eatery—where the chicken is confused and so are you.");
+        Coqbul = new Room("Welcome to Coqbul some succulent food in this place.");
         SuperMacs = new Room("Inside SuperMacs Diner. The fries here are almost as salty as the staff's jokes.");
         lockeBurger = new Room("At LockeBurger Bistro, where the burgers are deep and the thoughts are deeper.");
         burgerMac = new Room("You've entered Burger Mac Shack. The cook hasn't left the grill since 1997.");
@@ -89,6 +91,7 @@ public class ZorkULGame {
 
         boolean finished = false;
         while (!finished) {
+         
             Command command = parser.getCommand();
             finished = processCommand(command);
         }
@@ -119,11 +122,15 @@ public class ZorkULGame {
                 goRoom(command);
                 moveCount++;
                 energyLevel = energyLevel - 5;
-                if(energyLevel <= 0) {
-                    System.out.println("You have run out of energy and DIED. better luck next time!");
+                hungerLevel = hungerLevel - 3;
+                 // check for game over conditions
+                if(energyLevel <= 0 || hungerLevel <= 0) {
+                    System.out.println("You have run out of juice and DIED. better luck next time!");
                     return true; // End the game
                 }
-                displatEnergyBar();
+                // use the Character's energy-bar method
+                player.displayEnergyBar(energyLevel);
+                player.displayHungerBar(hungerLevel);
                 
                  
                 break;
@@ -137,8 +144,8 @@ public class ZorkULGame {
                 }
             } else {
                 System.out.println("Take what?");
-            }
-            break;
+                }
+                break;
 
             case "drop":  // Handle drop command
                 if (command.hasSecondWord()) {
@@ -151,39 +158,39 @@ public class ZorkULGame {
                 } else {
                     System.out.println("Drop what?");
                 }
-                break;
+                    break;
 
-            case "inventory":  // Handle inventory command
-                System.out.println(player.getInventoryString());
-                break;
+                case "inventory":  // Handle inventory command
+                    System.out.println(player.getInventoryString());
+                    break;
 
-            case "Menu":
-                player.getCurrentRoom().DisplayMenu();
-                break;
-                
-            case "quit":
-                if (command.hasSecondWord()) {
-                    System.out.println("Quit what?");
-                    return false;
-                } else {
-                    return true; // signal to quit
-                }
-            default:
-                System.out.println("I don't know what you mean...");
-                break;
-        }
-        return false;
+                case "Menu":
+                    player.getCurrentRoom().DisplayMenu();
+                    break;
+                    
+                case "quit":
+                    if (command.hasSecondWord()) {
+                        System.out.println("Quit what?");
+                        return false;
+                    } else {
+                        return true; // signal to quit
+                    }
+                default:
+                    System.out.println("I don't know what you mean...");
+                    break;
+       }  
+            return false;
     }
     //enerrgy bar method
-    private void displatEnergyBar(){
-        System.out.println("Energy level");
-                String bar = "[" +"*".repeat(energyLevel)+ "]";
-                if(energyLevel != 50){
-                    int goneEnergy = (50 - energyLevel);
-                    bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
-                }
-                System.out.println("["+bar+"]");
-    }
+    // private void displatEnergyBar(){
+    //     System.out.println("Energy level");
+    //             String bar = "[" +"*".repeat(energyLevel)+ "]";
+    //             if(energyLevel != 50){
+    //                 int goneEnergy = (50 - energyLevel);
+    //                 bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
+    //             }
+    //             System.out.println("["+bar+"]");
+    // }
 
     private void printHelp() {
         System.out.println("You are lost. You are alone. You wander around the university.");
@@ -209,6 +216,7 @@ public class ZorkULGame {
             System.out.println(player.getCurrentRoom().getLongDescription());
         }
     }
+
    
 
     public static void main(String[] args) {
