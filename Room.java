@@ -5,28 +5,53 @@ import java.util.ArrayList;
 public class Room {
     private String description;
     private Map<String, Room> exits; // Map direction to neighboring Room
-    private ArrayList<Item> items; //items
-    private Map<String, Double> foodMenu; //menu
+    private ArrayList<Item> items; // items
+    private Map<Integer, String> foodMenuNames; // map of names
+    private Map<Integer, Double> foodMenuPrices; // map of prices
 
     public Room(String description) {
         this.description = description;
         exits = new HashMap<>();
         items = new ArrayList<>();
-        foodMenu = new HashMap<>();
+        foodMenuNames = new HashMap<>();
+        foodMenuPrices = new HashMap<>();
     }
-    public void addMenuOption(String itemName, double price) {
-        foodMenu.put(itemName, price);
+
+    public void addMenuOption(int number, String itemName, double price) {
+        foodMenuNames.put(number, itemName);
+        foodMenuPrices.put(number, price);
     }
+
     public void DisplayMenu() {
         System.out.println("Available options:");
-            for (Map.Entry<String, Double> entry : foodMenu.entrySet()) {
-            String name = entry.getKey();    // burger name
-            Double price = entry.getValue(); // burger price
-            System.out.println(name + ": $" + price);
+        for (Integer num : foodMenuNames.keySet()) {
+            System.out.println(num + ". " + foodMenuNames.get(num) + " - £" + foodMenuPrices.get(num));
         }
-        System.out.println();
     }
-    
+
+    public PurchaseResult orderItem(double balance, int choiceNumber, int hungerLevel) {
+        if (foodMenuNames.containsKey(choiceNumber)) {
+            String itemName = foodMenuNames.get(choiceNumber);
+            Double price = foodMenuPrices.get(choiceNumber);
+            System.out.println("You ordered: " + itemName + " for £" + price);
+            if (balance < price) {
+                System.out.println("Insufficient balance to complete the purchase.");
+                return new PurchaseResult(hungerLevel, balance); // No change
+            }
+            balance = balance - price;
+
+            int refill = (int) (price * 3);
+            hungerLevel = hungerLevel + refill;
+            hungerLevel = Math.min(hungerLevel, 50);
+            System.out.println("Your new balance is: £" + balance);
+            System.out.println("Your hunger is now: " + hungerLevel);
+
+            return new PurchaseResult(hungerLevel, balance);
+        } else {
+            System.out.println("Sorry, that item is not on the menu.");
+            return new PurchaseResult(hungerLevel, balance);
+        }
+    }
 
     public String getDescription() {
         return description;
@@ -47,7 +72,7 @@ public class Room {
         }
         return sb.toString().trim();
     }
-    
+
     /**
      * Adds an item to this room
      * param item The item to add
@@ -55,6 +80,7 @@ public class Room {
     public void addItem(Item item) {
         items.add(item);
     }
+
     /**
      * Removes an item from this room by name
      * param itemName The name of the item to remove
@@ -67,9 +93,10 @@ public class Room {
                 return item;
             }
         }
-        return null;  // Item not found
+        return null; // Item not found
     }
-     /**
+
+    /**
      * Returns a formatted string of all items in this room
      * return String listing all items, or "none" if empty
      */
@@ -85,9 +112,8 @@ public class Room {
         return sb.substring(0, sb.length() - 2);
     }
 
-
     public String getLongDescription() {
-        return "You are " + description + ".\nExits: " + getExitString() 
-               + "\nItems: " + getItemsString();  //Add items to description
+        return "You are " + description + ".\nExits: " + getExitString()
+                + "\nItems: " + getItemsString(); // Add items to description
     }
 }
