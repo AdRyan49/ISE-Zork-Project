@@ -7,7 +7,8 @@ public class Room {
     private Map<String, Room> exits; // Map direction to neighboring Room
     private ArrayList<Item> items; // items
     private Map<Integer, String> foodMenuNames; // map of names
-    private Map<Integer, Double> foodMenuPrices; // map of prices
+    private Map<Integer, Double> foodMenuPrices;// map of prices
+    private ArrayList<NPC> npcs; //NPCs in the room
 
     public Room(String description) {
         this.description = description;
@@ -15,18 +16,20 @@ public class Room {
         items = new ArrayList<>();
         foodMenuNames = new HashMap<>();
         foodMenuPrices = new HashMap<>();
+        npcs = new ArrayList<>();
     }
 
     public void addMenuOption(int number, String itemName, double price) {
         foodMenuNames.put(number, itemName);
         foodMenuPrices.put(number, price);
     }
-
+    //learn
     public void DisplayMenu() {
         System.out.println("Available options:");
         for (Integer num : foodMenuNames.keySet()) {
             System.out.println(num + ". " + foodMenuNames.get(num) + " - £" + foodMenuPrices.get(num));
         }
+        System.out.println("3. Back (Exit Menu)"); 
     }
 
     public PurchaseResult orderItem(double balance, int choiceNumber, int hungerLevel) {
@@ -111,9 +114,40 @@ public class Room {
         // Remove trailing comma and space
         return sb.substring(0, sb.length() - 2);
     }
+    
+     public void addNPC(NPC npc) {
+        npcs.add(npc);
+    }
 
+    public NPC getNPC(String npcName) {
+        for (NPC npc : npcs) {
+            if (npc.getName().equalsIgnoreCase(npcName)) {
+                return npc;
+            }
+        }
+        return null; // NPC not found
+    }
+
+    public String getNPCsString() {
+        if (npcs.isEmpty()) {
+            return "nobody";
+        }
+        String result = "";
+        for (NPC npc : npcs) {
+            result = result + npc.getName() + ", ";
+        }
+        return result;
+    }
+    
+    
+    
+    
+    
+    
+    
     public String getLongDescription() {
         return "You are " + description + ".\nExits: " + getExitString()
-                + "\nItems: " + getItemsString(); // Add items to description
+                + "\nItems: " + getItemsString() // Add items to description
+                + "\nNPCs: " + getNPCsString();
     }
 }

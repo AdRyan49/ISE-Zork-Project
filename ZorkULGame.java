@@ -72,6 +72,11 @@ public class ZorkULGame {
         // Place items
         outside.addItem(key);
 
+        //add npcs
+        NPC chef = new NPC("Gordon", "Welcome to my restaurant! Enjoy your meal!");
+        Coqbul.addNPC(chef);
+        
+
         // initialise room exits
         outside.setExit("east", Coqbul);
         outside.setExit("south", lockeBurger);
@@ -113,7 +118,7 @@ public class ZorkULGame {
 
     private void printWelcome() {
         System.out.println();
-        System.out.println("Welcome to the University adventure!");
+        System.out.println("Welcome to the Restaurant Run!");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
         System.out.println(player.getCurrentRoom().getLongDescription());
@@ -179,19 +184,40 @@ public class ZorkULGame {
                 System.out.println(player.getInventoryString());
                 break;
 
-            case "Menu":
+            case "menu":
                 player.getCurrentRoom().DisplayMenu();
                 Scanner sc = new Scanner(System.in);
                 System.out.println("Enter the number of the item you wish to buy:");
                 System.out.println("Your balance is: £" + balance);
                 int input = sc.nextInt();
+                if (input == 3) {
+                    System.out.println("Exiting menu.");
+                    break;
+                }
                 PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
                 hungerLevel = result.hungerLevel;
-                player.displayHungerBar(hungerLevel);                
+               // player.displayHungerBar(hungerLevel);                
                 balance = result.balance;
 
                 break;
-
+            case "talk":
+                if (command.hasSecondWord()) {
+                    String npcName = command.getSecondWord();
+                    NPC npc = player.getCurrentRoom().getNPC(npcName);
+                    if (npc != null) {
+                       // npc.speak();
+                        System.out.println(npc.speak());
+                       // System.out.println("TEST");
+                        
+                    } else {
+                        System.out.println("There is no one here by that name.");
+                    }
+                } else {
+                    System.out.println("Talk to who?");
+                }
+                break;
+                
+                
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
@@ -199,6 +225,7 @@ public class ZorkULGame {
                 } else {
                     return true; // signal to quit
                 }
+            
 
             default:
                 System.out.println("I don't know what you mean...");

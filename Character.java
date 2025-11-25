@@ -135,6 +135,8 @@ public class Character {
                 System.out.println("["+bar+"]");
     }
     public void displayHungerBar(int hungerLevel){
+            hungerLevel = Math.max(0, hungerLevel);
+              
              System.out.println("Hunger level");
                 String bar = "[" +"*".repeat(hungerLevel)+ "]";
             if(hungerLevel != 50){
