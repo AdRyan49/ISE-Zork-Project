@@ -41,7 +41,7 @@ public class ZorkULGame {
     private void createRooms() {
         Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas, studentUnion,
                 ChickenHut, secretStorage;
-        ;
+        
 
         // create rooms
         outside = new Room("Your outide, the restaurants are waiting to serve you.");
@@ -51,12 +51,9 @@ public class ZorkULGame {
         burgerMac = new Room("You've entered Burger Mac Shack. The cook hasn't left the grill since 1997.");
         SomeDodgeyChipper = new Room("Welcome to Some Dodgey Chipper. The mystery meat is half the fun.");
         brownThomas = new Room("Alone by the legendary Brown Thomas Statue. Even the pigeons eye your snacks.");
-        studentUnion = new Room(
-                "The bustling Student Union. Students huddle in groups, complaining about prices and deadlines.");
-        ChickenHut = new Room(
-                "Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
-        secretStorage = new Room(
-                "A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
+        studentUnion = new Room("The bustling Student Union. Students huddle in groups, complaining about prices and deadlines.");
+        ChickenHut = new Room("Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
+        secretStorage = new Room("A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
         // Set up food menus for each room
 
         outside.addMenuOption(1, "Cheeseburger", 5.99);
@@ -100,13 +97,17 @@ public class ZorkULGame {
                 "Even statues hear secrets... The answer is guarded by a puzzle. Seek the Manager at LockeBurger. They protect the knowledge you seek...");
         brownThomas.addNPC(statue);
 
-        NPC Manager = new NPC("Librarian",
+        NPC Manager = new NPC("Manager",
                 "Ah, a seeker of savings! I guard the secret passage. Solve my puzzle and the path below will open. Type 'solve' when ready!");
         lockeBurger.addNPC(Manager);
 
-        NPC mysteriousFigure = new NPC("Myterious Figure",
+        NPC mysteriousFigure = new NPC("MyteriousFigure",
                 "Well done, budget master! The secret: SOME DODGEY CHIPPER sells the MYSTERY BURGER for £5.50 - cheapest on campus! I've left you a golden COUPON here. Use it at the Dodgey Chipper and win!");
-        secretStorage.addNPC(mysteriousFigure);
+                secretStorage.addNPC(mysteriousFigure);
+        NPC brownThomasFan = new NPC("BrownThomasFan",
+                "Did you hear about the curse of Brown Thomas? They say if you touch it, you fail your exams?");
+        brownThomas.addNPC(brownThomasFan);
+        
         // initialise room exits
         outside.setExit("east", Coqbul);
         outside.setExit("south", lockeBurger);
@@ -130,7 +131,7 @@ public class ZorkULGame {
         lockeBurger.setExit("south", studentUnion);
         lockeBurger.setExit("north", outside);
         lockeBurger.setExit("east", burgerMac);
-        lockeBurger.setExit("down", secretStorage); // ← Secret room (locked!)
+        lockeBurger.setExit("down", secretStorage); 
 
         secretStorage.setExit("up", lockeBurger);
 
@@ -286,76 +287,90 @@ public class ZorkULGame {
                     break;
                 }
 
-                // Start the quiz
-                System.out.println("\n=== THE MANAGER'S CHALLENGE ===");
-                System.out.println("Answer any 2 out of 3 questions correctly to prove your worth!\n");
+                // Track attempts (max 3)
+                int attempts = 0;
+                boolean puzzleSolved = false;
 
-                // Track correct answers
-                int correctAnswers = 0;
-                Scanner scanner = new Scanner(System.in);
+                while (attempts < 3 && !puzzleSolved) {
+                    attempts++;
+                    System.out.println("\n=== THE MANAGER'S CHALLENGE ===");
+                    System.out.println("Attempt " + attempts + "/3 - Answer ALL 3 questions correctly!\n");
 
-                // Question 1
-                System.out.println("QUESTION 1: What is the curse of Brown Thomas?");
-                System.out.println("A) If you touch it, you FAIL!");
-                System.out.println("B) It brings bad luck to your meal");
-                System.out.println("C) If you look at it, you lose energy");
-                System.out.print("Your answer (A/B/C): ");
-                String q1 = scanner.nextLine().toUpperCase();
-                if (q1.equals("A")) {
-                    System.out.println("✓ Correct! A legendary curse indeed!\n");
-                    correctAnswers++;
-                } else {
-                    System.out.println("✗ Wrong! It's a terrible curse.\n");
-                }
+                    // Track correct answers
+                    int correctAnswers = 0;
+                    Scanner scanner = new Scanner(System.in);
 
-                // Question 2
-                System.out.println("QUESTION 2: Which restaurant is the MOST EXPENSIVE?");
-                System.out.println("A) Coqbul");
-                System.out.println("B) LockeBurger");
-                System.out.println("C) SuperMacs");
-                System.out.print("Your answer (A/B/C): ");
-                String q2 = scanner.nextLine().toUpperCase();
-                if (q2.equals("B")) {
-                    System.out.println("✓ Correct! LockeBurger is ridiculously expensive!\n");
-                    correctAnswers++;
-                } else {
-                    System.out.println("✗ Wrong! LockeBurger is the priciest place.\n");
-                }
+                    // Question 1
+                    System.out.println("QUESTION 1: What is the curse of Brown Thomas?");
+                    System.out.println("A) If you touch it, you FAIL your exans!");
+                    System.out.println("B) It brings bad luck to your ability to pull");
+                    System.out.println("C) If you look at it for too long you get lost in its eyes");
+                    System.out.print("Your answer (A/B/C): ");
+                    String q1 = scanner.nextLine().trim().toUpperCase();
+                    if (q1.equals("A")) {
+                        System.out.println("✓ Correct! A legendary curse indeed!\n");
+                        correctAnswers++;
+                    } else {
+                        System.out.println("✗ Wrong!\n");
+                    }
 
-                // Question 3
-                System.out.println("QUESTION 3: Who has the CHEAPEST burger?");
-                System.out.println("(Psst... this might be useful later!)");
-                System.out.println("A) Some Dodgey Chipper");
-                System.out.println("B) SuperMacs");
-                System.out.println("C) Chicken Hut");
-                System.out.print("Your answer (A/B/C): ");
-                String q3 = scanner.nextLine().toUpperCase();
-                if (q3.equals("A")) {
-                    System.out.println("✓ Correct! Remember that hint...\n");
-                    correctAnswers++;
-                } else {
-                    System.out.println("✗ Wrong! Some Dodgey Chipper has the best deal.\n");
-                }
+                    // Question 2
+                    System.out.println("QUESTION 2: Which restaurant is the MOST EXPENSIVE?");
+                    System.out.println("A) Coqbul");
+                    System.out.println("B) LockeBurger");
+                    System.out.println("C) SuperMacs");
+                    System.out.print("Your answer (A/B/C): ");
+                    String q2 = scanner.nextLine().trim().toUpperCase();
+                    if (q2.equals("B")) {
+                        System.out.println("✓ Correct! LockeBurger is ridiculously expensive!\n");
+                        correctAnswers++;
+                    } else {
+                        System.out.println("✗ Wrong! \n");
+                    }
 
-                // Check if passed 
-                if (correctAnswers >= 3) {
-                    // Unlock secret room
-                    secretRoomUnlocked = true;
-                    System.out.println("=== YOU PASSED! ===");
-                    System.out.println("The Manager smiles and snaps their fingers...");
-                    System.out.println("*** The floor rumbles... ***");
-                    System.out.println("*** A secret passage opens below! ***");
-                    System.out.println("*** Type 'go down' to enter the secret storage! ***\n");
-                } else {
-                    // Failed - lose energy and can retry
-                    System.out.println("=== YOU FAILED ===");
-                    System.out.println("The Manager shakes their head disappointedly.");
-                    
-                    System.out.println("You lose 5 energy from stress!");
-                    energyLevel = energyLevel - 5;
-                    energyLevel = Math.max(0, energyLevel);
-                    player.displayEnergyBar(energyLevel);
-                    System.out.println("(Try again by typing 'solve')");
+                    // Question 3
+                    System.out.println("QUESTION 3: Who has the CHEAPEST burger?");
+                    System.out.println("(Psst... this might be useful later!)");
+                    System.out.println("A) Some Dodgey Chipper");
+                    System.out.println("B) SuperMacs");
+                    System.out.println("C) Chicken Hut");
+                    System.out.print("Your answer (A/B/C): ");
+                    String q3 = scanner.nextLine().trim().toUpperCase();
+                    if (q3.equals("A")) {
+                        System.out.println("✓ Correct! Remember that hint...\n");
+                        correctAnswers++;
+                    } else {
+                        System.out.println("✗ Wrong! Some Dodgey Chipper has the best deal.\n");
+                    }
+
+                    // Check if passed (need all 3 correct)
+                    if (correctAnswers == 3) {
+                        // Unlock secret room
+                        secretRoomUnlocked = true;
+                        puzzleSolved = true;
+                        System.out.println("=== YOU PASSED! ===");
+                        System.out.println("The Manager smiles and snaps their fingers...");
+                        System.out.println("*** The floor rumbles... ***");
+                        System.out.println("*** A secret passage opens below! ***");
+                        System.out.println("*** Type 'go down' to enter the secret storage! ***\n");
+                    } else {
+                        // Failed this attempt
+                        System.out.println("=== ATTEMPT FAILED ===");
+                        System.out.println("You got " + correctAnswers + " out of 3 correct.");
+                        System.out.println("You lose 5 energy from stress!");
+                        energyLevel = energyLevel - 5;
+                        energyLevel = Math.max(0, energyLevel);
+                        player.displayEnergyBar(energyLevel);
+
+                        // Tell player how many attempts left
+                        if (attempts < 3) {
+                            System.out.println("You have " + (3 - attempts) + " attempt(s) left!");
+                            System.out.println("(Type 'solve' again to retry)\n");
+                        } else {
+                            System.out.println("Game Over! You've used all 3 attempts!");
+                            System.out.println("You can never access the secret room now.\n");
+                        }
+                    }
                 }
                 break;
 
