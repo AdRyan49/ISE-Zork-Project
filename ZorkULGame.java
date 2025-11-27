@@ -23,6 +23,10 @@ public class ZorkULGame {
     private int energyLevel;
     private int hungerLevel;
     private double balance;
+    private int cluesFound = 0;
+    private boolean puzzleAvailable = false;
+    private boolean secretRoomUnlocked = false;
+    private boolean couponActive = false;
 
     public ZorkULGame() {
         createRooms();
@@ -35,7 +39,9 @@ public class ZorkULGame {
     }
 
     private void createRooms() {
-        Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas;
+        Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas, studentUnion,
+                ChickenHut, secretStorage;
+        ;
 
         // create rooms
         outside = new Room("Your outide, the restaurants are waiting to serve you.");
@@ -45,9 +51,14 @@ public class ZorkULGame {
         burgerMac = new Room("You've entered Burger Mac Shack. The cook hasn't left the grill since 1997.");
         SomeDodgeyChipper = new Room("Welcome to Some Dodgey Chipper. The mystery meat is half the fun.");
         brownThomas = new Room("Alone by the legendary Brown Thomas Statue. Even the pigeons eye your snacks.");
-
+        studentUnion = new Room(
+                "The bustling Student Union. Students huddle in groups, complaining about prices and deadlines.");
+        ChickenHut = new Room(
+                "Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
+        secretStorage = new Room(
+                "A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
         // Set up food menus for each room
-        // NEW (correct format with numbers)
+
         outside.addMenuOption(1, "Cheeseburger", 5.99);
         outside.addMenuOption(2, "Veggie Burger", 4.49);
 
@@ -63,20 +74,39 @@ public class ZorkULGame {
         burgerMac.addMenuOption(1, "Mac Burger", 7.50);
         burgerMac.addMenuOption(2, "Deluxe Mac", 8.99);
 
-        SomeDodgeyChipper.addMenuOption(1, "Mystery Burger", 5.50);
+        SomeDodgeyChipper.addMenuOption(1, "Mystery Burger", 5.00);
         SomeDodgeyChipper.addMenuOption(2, "Dodgey Special", 6.50);
 
+        ChickenHut.addMenuOption(1, "Fried Chicken Burger", 5.99);
+        ChickenHut.addMenuOption(2, "Spicy Wings Combo", 6.49);
+
         // Creat items
-        Item key = new Item("Coupon", "a cheeky discount coupon for your next meal");
+        Item coupon = new Item("Coupon", "The key to winning make sure to use it wisely!");
 
         // Place items
-        outside.addItem(key);
+        secretStorage.addItem(coupon);
 
-        //add npcs
-        NPC chef = new NPC("Gordon", "Welcome to my restaurant! Enjoy your meal!");
-        Coqbul.addNPC(chef);
-        
+        // add npcs
 
+        NPC student = new NPC("Student",
+                "Well lad You look broke like me. Want the CHEAPEST burger on campus? I don't know where it is, but the COOK at SuperMacs might. He's always complaining about competition. I'm to scared to talk to him, can you?");
+        studentUnion.addNPC(student);
+
+        NPC cook = new NPC("Cook",
+                "Cheapest burger? Bah! Bad for business. But fine... I heard rich students talking about it near the BROWN THOMAS STATUE. That old statue hears everything. Go there!");
+        SuperMacs.addNPC(cook);
+
+        NPC statue = new NPC("Statue",
+                "Even statues hear secrets... The answer is guarded by a puzzle. Seek the Manager at LockeBurger. They protect the knowledge you seek...");
+        brownThomas.addNPC(statue);
+
+        NPC Manager = new NPC("Librarian",
+                "Ah, a seeker of savings! I guard the secret passage. Solve my puzzle and the path below will open. Type 'solve' when ready!");
+        lockeBurger.addNPC(Manager);
+
+        NPC mysteriousFigure = new NPC("Myterious Figure",
+                "Well done, budget master! The secret: SOME DODGEY CHIPPER sells the MYSTERY BURGER for £5.50 - cheapest on campus! I've left you a golden COUPON here. Use it at the Dodgey Chipper and win!");
+        secretStorage.addNPC(mysteriousFigure);
         // initialise room exits
         outside.setExit("east", Coqbul);
         outside.setExit("south", lockeBurger);
@@ -89,16 +119,26 @@ public class ZorkULGame {
         brownThomas.setExit("south", outside);
 
         SuperMacs.setExit("east", outside);
+        SuperMacs.setExit("south", ChickenHut);
 
+        ChickenHut.setExit("north", SuperMacs);
+        ChickenHut.setExit("east", studentUnion);
+
+        studentUnion.setExit("west", ChickenHut);
+        studentUnion.setExit("north", lockeBurger);
+
+        lockeBurger.setExit("south", studentUnion);
         lockeBurger.setExit("north", outside);
         lockeBurger.setExit("east", burgerMac);
+        lockeBurger.setExit("down", secretStorage); // ← Secret room (locked!)
+
+        secretStorage.setExit("up", lockeBurger);
 
         burgerMac.setExit("west", lockeBurger);
         burgerMac.setExit("north", SomeDodgeyChipper);
 
         SomeDodgeyChipper.setExit("west", Coqbul);
         SomeDodgeyChipper.setExit("south", burgerMac);
-        Item item = new Item("Generic Box", "This is a generic box holding a item.");
 
         // create the player character and start outside
         player = new Character("player", outside);
@@ -133,10 +173,10 @@ public class ZorkULGame {
             return false;
         }
         // check for game over conditions
-                if (energyLevel <= 0 || hungerLevel <= 0) {
-                    System.out.println("You have run out of juice and DIED. better luck next time!");
-                    return true; // End the game
-                }
+        if (energyLevel <= 0 || hungerLevel <= 0) {
+            System.out.println("You have run out of juice and DIED. better luck next time!");
+            return true; // End the game
+        }
         switch (commandWord) {
             case "help":
                 printHelp();
@@ -146,7 +186,6 @@ public class ZorkULGame {
                 moveCount++;
                 energyLevel = energyLevel - 1;
                 hungerLevel = hungerLevel - 5;
-                
 
                 // use the Character's energy-bar method
                 player.displayEnergyBar(energyLevel);
@@ -196,7 +235,7 @@ public class ZorkULGame {
                 }
                 PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
                 hungerLevel = result.hungerLevel;
-               // player.displayHungerBar(hungerLevel);                
+                // player.displayHungerBar(hungerLevel);
                 balance = result.balance;
 
                 break;
@@ -205,10 +244,21 @@ public class ZorkULGame {
                     String npcName = command.getSecondWord();
                     NPC npc = player.getCurrentRoom().getNPC(npcName);
                     if (npc != null) {
-                       // npc.speak();
-                        System.out.println(npc.speak());
-                       // System.out.println("TEST");
-                        
+                        if (!npc.hasSpoken()) {
+                            System.out.println(npc.speak());
+                            cluesFound++;
+                            System.out.println("\n[Progress: Talked to " + cluesFound + " people]");
+
+                            // Special case: Manager triggers puzzle availability
+                            if (npc.getName().equalsIgnoreCase("Manager")) {
+                                puzzleAvailable = true;
+                                System.out.println("\n*** The Manager is ready to test you! ***");
+                                System.out.println("*** Type 'solve' to attempt the puzzle! ***\n");
+                            }
+                        } else {
+                            System.out.println(npc.speak());
+                            System.out.println("(You've already talked to them.)");
+                        }
                     } else {
                         System.out.println("There is no one here by that name.");
                     }
@@ -216,8 +266,99 @@ public class ZorkULGame {
                     System.out.println("Talk to who?");
                 }
                 break;
-                
-                
+            case "solve":
+                // Check if Manager is in this room
+                NPC manager = player.getCurrentRoom().getNPC("Manager");
+                if (manager == null) {
+                    System.out.println("There's no one here to give you a puzzle!");
+                    break;
+                }
+
+                // Check if player talked to Manager first
+                if (!puzzleAvailable) {
+                    System.out.println("You need to talk to the Manager first!");
+                    break;
+                }
+
+                // Check if puzzle already solved
+                if (secretRoomUnlocked) {
+                    System.out.println("You've already solved this puzzle! The path down is open.");
+                    break;
+                }
+
+                // Start the quiz
+                System.out.println("\n=== THE MANAGER'S CHALLENGE ===");
+                System.out.println("Answer any 2 out of 3 questions correctly to prove your worth!\n");
+
+                // Track correct answers
+                int correctAnswers = 0;
+                Scanner scanner = new Scanner(System.in);
+
+                // Question 1
+                System.out.println("QUESTION 1: What is the curse of Brown Thomas?");
+                System.out.println("A) If you touch it, you FAIL!");
+                System.out.println("B) It brings bad luck to your meal");
+                System.out.println("C) If you look at it, you lose energy");
+                System.out.print("Your answer (A/B/C): ");
+                String q1 = scanner.nextLine().toUpperCase();
+                if (q1.equals("A")) {
+                    System.out.println("✓ Correct! A legendary curse indeed!\n");
+                    correctAnswers++;
+                } else {
+                    System.out.println("✗ Wrong! It's a terrible curse.\n");
+                }
+
+                // Question 2
+                System.out.println("QUESTION 2: Which restaurant is the MOST EXPENSIVE?");
+                System.out.println("A) Coqbul");
+                System.out.println("B) LockeBurger");
+                System.out.println("C) SuperMacs");
+                System.out.print("Your answer (A/B/C): ");
+                String q2 = scanner.nextLine().toUpperCase();
+                if (q2.equals("B")) {
+                    System.out.println("✓ Correct! LockeBurger is ridiculously expensive!\n");
+                    correctAnswers++;
+                } else {
+                    System.out.println("✗ Wrong! LockeBurger is the priciest place.\n");
+                }
+
+                // Question 3
+                System.out.println("QUESTION 3: Who has the CHEAPEST burger?");
+                System.out.println("(Psst... this might be useful later!)");
+                System.out.println("A) Some Dodgey Chipper");
+                System.out.println("B) SuperMacs");
+                System.out.println("C) Chicken Hut");
+                System.out.print("Your answer (A/B/C): ");
+                String q3 = scanner.nextLine().toUpperCase();
+                if (q3.equals("A")) {
+                    System.out.println("✓ Correct! Remember that hint...\n");
+                    correctAnswers++;
+                } else {
+                    System.out.println("✗ Wrong! Some Dodgey Chipper has the best deal.\n");
+                }
+
+                // Check if passed 
+                if (correctAnswers >= 3) {
+                    // Unlock secret room
+                    secretRoomUnlocked = true;
+                    System.out.println("=== YOU PASSED! ===");
+                    System.out.println("The Manager smiles and snaps their fingers...");
+                    System.out.println("*** The floor rumbles... ***");
+                    System.out.println("*** A secret passage opens below! ***");
+                    System.out.println("*** Type 'go down' to enter the secret storage! ***\n");
+                } else {
+                    // Failed - lose energy and can retry
+                    System.out.println("=== YOU FAILED ===");
+                    System.out.println("The Manager shakes their head disappointedly.");
+                    
+                    System.out.println("You lose 5 energy from stress!");
+                    energyLevel = energyLevel - 5;
+                    energyLevel = Math.max(0, energyLevel);
+                    player.displayEnergyBar(energyLevel);
+                    System.out.println("(Try again by typing 'solve')");
+                }
+                break;
+
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
@@ -225,7 +366,6 @@ public class ZorkULGame {
                 } else {
                     return true; // signal to quit
                 }
-            
 
             default:
                 System.out.println("I don't know what you mean...");
