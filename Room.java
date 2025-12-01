@@ -1,8 +1,10 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class Room {
+public class Room implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String description;
     private Map<String, Room> exits; // Map direction to neighboring Room
     private ArrayList<Item> items; // items

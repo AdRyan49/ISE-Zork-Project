@@ -1,7 +1,9 @@
 import java.util.HashMap;
 import java.util.Map;
+import java.io.Serializable;
 
-public class CommandWords {
+public class CommandWords implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Map<String, String> validCommands;
 
     public CommandWords() {
@@ -19,6 +21,9 @@ public class CommandWords {
         validCommands.put("talk", "Talk to an NPC");
         validCommands.put("solve", "Solve a puzzle");
         validCommands.put("use", "Use an item ");
+        validCommands.put("save", "Save your game progress");
+        validCommands.put("load", "Load a previously saved game");
+
     }
 
     public boolean isCommand(String commandWord) {

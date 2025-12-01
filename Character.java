@@ -1,16 +1,17 @@
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class Character {
+public class Character implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String name;
     private Room currentRoom;
-    private ArrayList<Item> inventory;  // NEW: Player's inventory
-    
+    private ArrayList<Item> inventory; // NEW: Player's inventory
 
     public Character(String name, Room startingRoom) {
         this.name = name;
         this.currentRoom = startingRoom;
-        this.inventory = new ArrayList<>();  // NEW: Initialize empty inventory
-        
+        this.inventory = new ArrayList<>(); // NEW: Initialize empty inventory
+
     }
 
     public String getName() {
@@ -110,8 +111,8 @@ public class Character {
     // NEW: Drop an item from inventory to a room
     /**
      * Drops an item from inventory into a specific room
-     *  room The room to drop the item into
-     *  itemName The name of the item to drop
+     * room The room to drop the item into
+     * itemName The name of the item to drop
      * return true if item was dropped successfully, false otherwise
      */
     public boolean dropItem(Room room, String itemName) {
@@ -123,26 +124,25 @@ public class Character {
         return false;
     }
 
-                
-   
-   public void displayEnergyBar(int energyLevel){
-             System.out.println("Energy level");
-                String bar = "[" +"*".repeat(energyLevel)+ "]";
-            if(energyLevel != 50){
-                    int goneEnergy = (50 - energyLevel);
-                    bar = "=".repeat(energyLevel)+ " ".repeat(goneEnergy); 
-                }
-                System.out.println("["+bar+"]");
+    public void displayEnergyBar(int energyLevel) {
+        System.out.println("Energy level");
+        String bar = "[" + "*".repeat(energyLevel) + "]";
+        if (energyLevel != 50) {
+            int goneEnergy = (50 - energyLevel);
+            bar = "=".repeat(energyLevel) + " ".repeat(goneEnergy);
+        }
+        System.out.println("[" + bar + "]");
     }
-    public void displayHungerBar(int hungerLevel){
-            hungerLevel = Math.max(0, hungerLevel);
-              
-             System.out.println("Hunger level");
-                String bar = "[" +"*".repeat(hungerLevel)+ "]";
-            if(hungerLevel != 50){
-                    int goneHunger = (50 - hungerLevel);
-                    bar = "=".repeat(hungerLevel)+ " ".repeat(goneHunger); 
-                }
-                System.out.println("["+bar+"]");
+
+    public void displayHungerBar(int hungerLevel) {
+        System.out.println("Hunger level");
+        hungerLevel = Math.max(0, hungerLevel);
+
+        String bar = "[" + "*".repeat(hungerLevel) + "]";
+        if (hungerLevel != 50) {
+            int goneHunger = (50 - hungerLevel);
+            bar = "=".repeat(hungerLevel) + " ".repeat(goneHunger);
+        }
+        System.out.println("[" + bar + "]");
     }
 }

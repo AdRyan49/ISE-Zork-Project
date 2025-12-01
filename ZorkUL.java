@@ -1,7 +1,36 @@
+import java.util.Scanner;
+
 public class ZorkUL {
-    public static final String WELCOME_MESSAGE =
-        "***************************************************************\n" +
-        "                  Welcome to Restaurnt Run.\n" +
-        "***************************************************************\n";
-    public static final String VERSION = "1.0";
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        ZorkULGame game;
+        
+        System.out.println("╔════════════════════════════════════╗");
+        System.out.println("║   Welcome to Restaurant Run!       ║");
+        System.out.println("╚════════════════════════════════════╝\n");
+        
+        System.out.println("1) Start new game");
+        System.out.println("2) Load saved game");
+        System.out.print("Choose (1 or 2): ");
+        
+        String choice = scanner.nextLine().trim();
+        
+        if (choice.equals("2")) {
+            System.out.println("\nEnter save file name to load (e.g., 'mysave'):");
+            String saveName = scanner.nextLine().trim();
+            
+            game = SaveGame.loadGame(saveName + ".sav");
+            
+            if (game == null) {
+                System.out.println("✗ Save file not found! Starting new game instead.\n");
+                game = new ZorkULGame();
+            } else {
+                System.out.println("✓ Save loaded! Continuing your adventure...\n");
+            }
+        } else {
+            game = new ZorkULGame();
+        }
+        
+        game.play();
+    }
 }

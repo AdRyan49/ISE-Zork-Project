@@ -1,11 +1,19 @@
 import java.util.Scanner;
+import java.io.Serializable;
 
-public class Parser {
+public class Parser implements Serializable {
+    private static final long serialVersionUID = 1L;
     private CommandWords commands;
-    private Scanner reader;
+    private transient Scanner reader;
 
     public Parser() {
         commands = new CommandWords();
+        reader = new Scanner(System.in);
+    }
+
+    // Reinitialize scanner after deserialization
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
         reader = new Scanner(System.in);
     }
 

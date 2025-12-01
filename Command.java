@@ -1,4 +1,7 @@
-public class Command {
+import java.io.Serializable;
+
+public class Command implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String commandWord;
     private String secondWord;
 

@@ -1,3 +1,4 @@
+
 /* This game is a classic text-based adventure set in a university environment.
    The player starts outside the main entrance and can navigate through different rooms like a 
    lecture Coqbul, campus SuperMacs, computing lockeBurger, and admin burgerMac using simple text commands (e.g., "go east", "go west").
@@ -12,11 +13,12 @@ Help system: Lists valid commands to guide the player.
 Overall, it recreates the classic Zork interactive fiction experience with a university-themed setting, 
 emphasizing exploration and simple command-driven gameplay
 */
-
+import java.io.Serializable;
 import java.security.Key;
 import java.util.Scanner;
 
-public class ZorkULGame {
+public class ZorkULGame implements Serializable {
+    private static final long serialVersionUID = 1L;
     private Parser parser;
     private Character player;
     private int moveCount;
@@ -27,11 +29,11 @@ public class ZorkULGame {
     private boolean puzzleAvailable = false;
     private boolean secretRoomUnlocked = false;
     private boolean couponActive = false;
-    private boolean clue1Talked = false;  // Talked to Student
-    private boolean clue2Talked = false;  // Talked to Cook
-    private boolean clue3Talked = false;  // Talked to Statue
-    private boolean clue4Talked = false;  // Talked to Manager
-    private boolean clue5Talked = false;  // Talked to Mysterious Figure
+    private boolean clue1Talked = false; // Talked to Student
+    private boolean clue2Talked = false; // Talked to Cook
+    private boolean clue3Talked = false; // Talked to Statue
+    private boolean clue4Talked = false; // Talked to Manager
+    private boolean clue5Talked = false; // Talked to Mysterious Figure
 
     public ZorkULGame() {
         createRooms();
@@ -46,7 +48,6 @@ public class ZorkULGame {
     private void createRooms() {
         Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas, studentUnion,
                 ChickenHut, secretStorage;
-        
 
         // create rooms
         outside = new Room("Your outide, the restaurants are waiting to serve you.");
@@ -56,9 +57,12 @@ public class ZorkULGame {
         burgerMac = new Room("You've entered Burger Mac Shack. The cook hasn't left the grill since 1997.");
         SomeDodgeyChipper = new Room("Welcome to Some Dodgey Chipper. The mystery meat is half the fun.");
         brownThomas = new Room("Alone by the legendary Brown Thomas Statue. Even the pigeons eye your snacks.");
-        studentUnion = new Room("The bustling Student Union. Students huddle in groups, complaining about prices and deadlines.");
-        ChickenHut = new Room("Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
-        secretStorage = new Room("A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
+        studentUnion = new Room(
+                "The bustling Student Union. Students huddle in groups, complaining about prices and deadlines.");
+        ChickenHut = new Room(
+                "Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
+        secretStorage = new Room(
+                "A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
         // Set up food menus for each room
 
         outside.addMenuOption(1, "Cheeseburger", 5.99);
@@ -72,7 +76,6 @@ public class ZorkULGame {
 
         lockeBurger.addMenuOption(1, "Classic Burger", 8.50);
         lockeBurger.addMenuOption(2, "Premium Burger", 9.99);
-        
 
         burgerMac.addMenuOption(1, "Mac Burger", 7.50);
         burgerMac.addMenuOption(2, "Deluxe Mac", 8.99);
@@ -109,11 +112,11 @@ public class ZorkULGame {
 
         NPC mysteriousFigure = new NPC("MyteriousFigure",
                 "Well done, budget master! The secret: SOME DODGEY CHIPPER sells the MYSTERY BURGER for £5.50 - cheapest on campus! I've left you a golden COUPON here. Use it at the Dodgey Chipper and win!");
-                secretStorage.addNPC(mysteriousFigure);
+        secretStorage.addNPC(mysteriousFigure);
         NPC brownThomasFan = new NPC("BrownThomasFan",
                 "Did you hear about the curse of Brown Thomas? They say if you touch it, you fail your exams?");
         brownThomas.addNPC(brownThomasFan);
-        
+
         // initialise room exits
         outside.setExit("east", Coqbul);
         outside.setExit("south", lockeBurger);
@@ -136,10 +139,9 @@ public class ZorkULGame {
 
         lockeBurger.setExit("west", ChickenHut);
 
-       
         lockeBurger.setExit("north", outside);
         lockeBurger.setExit("east", burgerMac);
-        lockeBurger.setExit("south", secretStorage); 
+        lockeBurger.setExit("south", secretStorage);
 
         secretStorage.setExit("north", lockeBurger);
 
@@ -254,9 +256,75 @@ public class ZorkULGame {
                     NPC npc = player.getCurrentRoom().getNPC(npcName);
                     if (npc != null) {
                         if (!npc.hasSpoken()) {
-                            // First time talking to this NPC
-                            String output = handleNPCDialogue(npc);
-                            System.out.println(output);
+                            // First time talking to this NPC - Check clue progression
+
+                            if (npc.getName().equalsIgnoreCase("Student")) {
+                                // CLUE 1 - Always available (starter)
+                                System.out.println(npc.speak());
+                                clue1Talked = true;
+                                System.out.println("\n[Clue 1/5: Learn about the Cook]");
+
+                            } else if (npc.getName().equalsIgnoreCase("Cook")) {
+                                if (clue1Talked) {
+                                    // Player talked to Student first - give info!
+                                    System.out.println(npc.speak());
+                                    clue2Talked = true;
+                                    System.out.println("\n[Clue 2/5: Learn about the Statue]");
+                                } else {
+                                    // Player didn't talk to Student - no info
+                                    System.out.println(
+                                            "What do you want? I'm busy. Come back after you've done your homework.");
+                                    System.out.println("(You need to talk to the Student first)");
+                                }
+
+                            } else if (npc.getName().equalsIgnoreCase("Statue")) {
+                                if (clue2Talked) {
+                                    // Player talked to Cook first - give info!
+                                    System.out.println(npc.speak());
+                                    clue3Talked = true;
+                                    System.out.println("\n[Clue 3/5: Learn about the Manager]");
+                                } else {
+                                    // Player didn't talk to Cook - no info
+                                    System.out.println(
+                                            "*The statue stands silent, offering no wisdom to those unprepared.*");
+                                    System.out.println("(You need to talk to the Cook first)");
+                                }
+
+                            } else if (npc.getName().equalsIgnoreCase("Manager")) {
+                                if (clue3Talked) {
+                                    // Player talked to Statue first - give info!
+                                    System.out.println(npc.speak());
+                                    clue4Talked = true;
+                                    puzzleAvailable = true;
+                                    System.out.println("\n[Clue 4/5: Unlock the puzzle!]");
+                                    System.out.println("*** The Manager is ready to test you! ***");
+                                    System.out.println("*** Type 'solve' to attempt the puzzle! ***\n");
+                                } else {
+                                    // Player didn't talk to Statue - no info
+                                    System.out.println(
+                                            "I don't have time for random visitors. Come back when you've earned it.");
+                                    System.out.println("(You need to talk to the Statue first)");
+                                }
+
+                            } else if (npc.getName().equalsIgnoreCase("MysteriousFigure")
+                                    || npc.getName().equalsIgnoreCase("Mysterious Figure")) {
+                                if (secretRoomUnlocked) {
+                                    // Player solved puzzle first - give final info!
+                                    System.out.println(npc.speak());
+                                    clue5Talked = true;
+                                    System.out.println(
+                                            "\n[Clue 5/5: FINAL CLUE - Some Dodgey Chipper has the Mystery Burger!]");
+                                } else {
+                                    // Player found secret room but didn't solve puzzle - confused NPC
+                                    System.out.println("Who are you? How did you get down here?");
+                                    System.out.println("(You need to solve the Manager's puzzle first)");
+                                }
+
+                            } else {
+                                // Any other NPC
+                                System.out.println(npc.speak());
+                            }
+
                         } else {
                             // Already talked to this NPC
                             System.out.println(npc.speak());
@@ -376,6 +444,28 @@ public class ZorkULGame {
                 }
                 break;
 
+            case "use":
+                if (player.hasItem("Coupon")) {
+                    if (player.getCurrentRoom().getDescription().contains("Some Dodgey Chipper")) {
+                        System.out.println("You used the GOLDEN COUPON!");
+                        System.out.println("Congratulations! You've won the game with the cheapest burger on campus!");
+                        System.out.println("Thank you for playing. Goodbye.");
+                        System.exit(0);
+                    } else {
+                        System.out.println("You can only use the COUPON at Some Dodgey Chipper!");
+                    }
+                } else {
+                    System.out.println("You don't have a coupon!");
+                }
+                break;
+           
+            case "save":
+                System.out.println("Enter save file name (e.g., 'mysave'):");
+                Scanner saveScanner = new Scanner(System.in);
+                String saveName = saveScanner.nextLine().trim();
+                SaveGame.saveGame(saveName + ".sav", this);
+                break;
+
             case "quit":
                 if (command.hasSecondWord()) {
                     System.out.println("Quit what?");
@@ -401,52 +491,6 @@ public class ZorkULGame {
     // System.out.println("["+bar+"]");
     // }
 
-    private String handleNPCDialogue(NPC npc) {
-        String npcName = npc.getName().toLowerCase();
-        
-        if (npcName.contains("student")) {
-            clue1Talked = true;
-            return npc.speak() + "\n\n[Clue 1/5: Learn about the Cook]";
-            
-        } else if (npcName.contains("cook")) {
-            if (clue1Talked) {
-                clue2Talked = true;
-                return npc.speak() + "\n\n[Clue 2/5: Learn about the Statue]";
-            } else {
-                return "What do you want? I'm busy. Come back after you've done your homework.\n(You need to talk to the Student first)";
-            }
-            
-        } else if (npcName.contains("statue")) {
-            if (clue2Talked) {
-                clue3Talked = true;
-                return npc.speak() + "\n\n[Clue 3/5: Learn about the Manager]";
-            } else {
-                return "*The statue stands silent, offering no wisdom to those unprepared.*\n(You need to talk to the Cook first)";
-            }
-            
-        } else if (npcName.contains("manager")) {
-            if (clue3Talked) {
-                clue4Talked = true;
-                puzzleAvailable = true;
-                return npc.speak() + "\n\n[Clue 4/5: Unlock the puzzle!]\n*** The Manager is ready to test you! ***\n*** Type 'solve' to attempt the puzzle! ***";
-            } else {
-                return "I don't have time for random visitors. Come back when you've earned it.\n(You need to talk to the Statue first)";
-            }
-            
-        } else if (npcName.contains("mysterious")) {
-            if (secretRoomUnlocked) {
-                clue5Talked = true;
-                return npc.speak() + "\n\n[Clue 5/5: FINAL CLUE - Some Dodgey Chipper has the Mystery Burger!]";
-            } else {
-                return "Who are you? How did you get down here?\n(You need to solve the Manager's puzzle first)";
-            }
-            
-        } else {
-            // Any other NPC
-            return npc.speak();
-        }
-    }
-
     private void printHelp() {
         System.out.println("You are lost. You are alone. You wander around the university.");
         System.out.print("Your command words are: ");
@@ -461,16 +505,16 @@ public class ZorkULGame {
         }
 
         String direction = command.getSecondWord();
-        
+
         // Block south from LockeBurger until puzzle solved
-        if (direction.equalsIgnoreCase("south") && 
-            player.getCurrentRoom().getDescription().contains("LockeBurger") && 
-            !secretRoomUnlocked) {
+        if (direction.equalsIgnoreCase("south") &&
+                player.getCurrentRoom().getDescription().contains("LockeBurger") &&
+                !secretRoomUnlocked) {
             System.out.println("A mysterious lock blocks the passage south.");
             System.out.println("Perhaps you need to solve a puzzle first?");
             return;
         }
-        
+
         Room nextRoom = player.getCurrentRoom().getExit(direction);
 
         if (nextRoom == null) {

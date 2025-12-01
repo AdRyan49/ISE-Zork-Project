@@ -1,4 +1,7 @@
-public class PurchaseResult {
+import java.io.Serializable;
+
+public class PurchaseResult implements Serializable {
+    private static final long serialVersionUID = 1L;
     public int hungerLevel;
     public double balance;
 
