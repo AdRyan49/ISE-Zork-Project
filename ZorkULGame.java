@@ -34,6 +34,8 @@ public class ZorkULGame implements Serializable {
     private boolean clue3Talked = false; // Talked to Statue
     private boolean clue4Talked = false; // Talked to Manager
     private boolean clue5Talked = false; // Talked to Mysterious Figure
+    private int puzzleQuestion = 0; // Track which question (0=not started, 1-3=questions)
+    private int correctAnswers = 0; // Track correct answers
 
     public ZorkULGame() {
         createRooms();
@@ -528,5 +530,273 @@ public class ZorkULGame implements Serializable {
     public static void main(String[] args) {
         ZorkULGame game = new ZorkULGame();
         game.play();
+    }
+
+    // GUI METHODS
+    public String getWelcomeMessage() {
+        return "You are lost. You are alone. You wander around the university.";
+    }
+
+    public String getCurrentRoomDescription() {
+        return player.getCurrentRoom().getLongDescription();
+    }
+
+    public String executeCommand(Command command) {
+        StringBuilder response = new StringBuilder();
+        String commandWord = command.getCommandWord();
+
+        if (commandWord == null) {
+            response.append("I don't understand your command...\n");
+            return response.toString();
+        }
+
+        if (energyLevel <= 0 || hungerLevel <= 0) {
+            response.append("You have run out of juice and DIED. Better luck next time!\n");
+            return response.toString();
+        }
+
+        switch (commandWord) {
+            case "help":
+                response.append("Commands: go, take, drop, inventory, menu, talk, solve, use, look, save, quit\n");
+                break;
+
+            case "go":
+                if (!command.hasSecondWord()) {
+                    response.append("Go where?\n");
+                } else {
+                    String direction = command.getSecondWord();
+                    if (direction.equalsIgnoreCase("south") && player.getCurrentRoom().getDescription().contains("LockeBurger") && !secretRoomUnlocked) {
+                        response.append("A mysterious lock blocks the passage south.\n");
+                    } else {
+                        Room nextRoom = player.getCurrentRoom().getExit(direction);
+                        if (nextRoom == null) {
+                            response.append("There is no door!\n");
+                        } else {
+                            player.setCurrentRoom(nextRoom);
+                            moveCount++;
+                            energyLevel--;
+                            hungerLevel -= 5;
+                            response.append(player.getCurrentRoom().getLongDescription()).append("\n");
+                            response.append("[Energy: ").append(energyLevel).append("/50 | Hunger: ").append(hungerLevel).append("/50]\n");
+                        }
+                    }
+                }
+                break;
+
+            case "take":
+                if (command.hasSecondWord()) {
+                    if (player.takeItem(player.getCurrentRoom(), command.getSecondWord())) {
+                        response.append("You picked up: ").append(command.getSecondWord()).append("\n");
+                    } else {
+                        response.append("That item is not here!\n");
+                    }
+                } else {
+                    response.append("Take what?\n");
+                }
+                break;
+
+            case "drop":
+                if (command.hasSecondWord()) {
+                    if (player.dropItem(player.getCurrentRoom(), command.getSecondWord())) {
+                        response.append("You dropped: ").append(command.getSecondWord()).append("\n");
+                    } else {
+                        response.append("You don't have that item!\n");
+                    }
+                } else {
+                    response.append("Drop what?\n");
+                }
+                break;
+
+            case "inventory":
+                response.append(player.getInventoryString()).append("\n");
+                break;
+
+            case "menu":
+                if (command.hasSecondWord()) {
+                    int input = Integer.parseInt(command.getSecondWord());
+                    if (input == 3) {
+                        response.append("Exiting menu.\n");
+                    } else {
+                        PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
+                        hungerLevel = result.hungerLevel;
+                        balance = result.balance;
+                        response.append(result.toString()).append("\n");
+                    }
+                } else {
+                    response.append(player.getCurrentRoom().DisplayMenu()).append("\nBalance: £").append(balance).append("\nType 'menu 1' or 'menu 2'\n");
+                }
+                break;
+
+            case "talk":
+                if (command.hasSecondWord()) {
+                    NPC npc = player.getCurrentRoom().getNPC(command.getSecondWord());
+                    if (npc != null) {
+                        if (!npc.hasSpoken()) {
+                            if (npc.getName().equalsIgnoreCase("Student")) {
+                                clue1Talked = true;
+                                response.append(npc.speak()).append("\n[Clue 1/5: Learn about the Cook]\n");
+                            } else if (npc.getName().equalsIgnoreCase("Cook")) {
+                                if (clue1Talked) {
+                                    clue2Talked = true;
+                                    response.append(npc.speak()).append("\n[Clue 2/5: Learn about the Statue]\n");
+                                } else {
+                                    response.append("What do you want? I'm busy. (Talk to the Student first)\n");
+                                }
+                            } else if (npc.getName().equalsIgnoreCase("Statue")) {
+                                if (clue2Talked) {
+                                    clue3Talked = true;
+                                    response.append(npc.speak()).append("\n[Clue 3/5: Learn about the Manager]\n");
+                                } else {
+                                    response.append("*The statue stands silent* (Talk to the Cook first)\n");
+                                }
+                            } else if (npc.getName().equalsIgnoreCase("Manager")) {
+                                if (clue3Talked) {
+                                    clue4Talked = true;
+                                    puzzleAvailable = true;
+                                    response.append(npc.speak()).append("\n[Clue 4/5: Unlock the puzzle!]\n");
+                                    response.append("*** The Manager is ready to test you! ***\n");
+                                    response.append("*** Type 'solve' to attempt the puzzle! ***\n");
+                                } else {
+                                    response.append("I don't have time for random visitors. (Talk to the Statue first)\n");
+                                }
+                            } else if (npc.getName().equalsIgnoreCase("MysteriousFigure")) {
+                                if (secretRoomUnlocked) {
+                                    clue5Talked = true;
+                                    response.append(npc.speak()).append("\n[Clue 5/5: FINAL CLUE]\n");
+                                } else {
+                                    response.append("Who are you? How did you get down here?\n");
+                                }
+                            } else {
+                                response.append(npc.speak()).append("\n");
+                            }
+                        } else {
+                            response.append(npc.speak()).append("\n(You've already talked to them.)\n");
+                        }
+                    } else {
+                        response.append("No one here by that name.\n");
+                    }
+                } else {
+                    response.append("Talk to who?\n");
+                }
+                break;
+
+            case "solve":
+                if (secretRoomUnlocked) {
+                    response.append("Puzzle already solved!\n");
+                } else if (!puzzleAvailable) {
+                    response.append("Talk to Manager first!\n");
+                } else {
+                    // Start puzzle or continue answering questions
+                    if (puzzleQuestion == 0) {
+                        // Start the puzzle
+                        puzzleQuestion = 1;
+                        correctAnswers = 0;
+                        response.append("=== THE MANAGER'S CHALLENGE ===\n\n");
+                        response.append("QUESTION 1: What is the curse of Brown Thomas?\n");
+                        response.append("A) If you touch it, you FAIL your exams!\n");
+                        response.append("B) It brings bad luck to your ability to pull\n");
+                        response.append("C) If you look at it for too long you get lost in its eyes\n\n");
+                        response.append("Type 'solve A', 'solve B', or 'solve C'\n");
+                    } else if (command.hasSecondWord()) {
+                        String answer = command.getSecondWord().toUpperCase();
+                        
+                        if (puzzleQuestion == 1) {
+                            // Question 1 answer (correct: A)
+                            if (answer.equals("A")) {
+                                correctAnswers++;
+                                response.append("✓ Correct! A legendary curse indeed!\n\n");
+                            } else {
+                                response.append("✗ Wrong!\n\n");
+                            }
+                            puzzleQuestion = 2;
+                            response.append("QUESTION 2: Which restaurant is the MOST EXPENSIVE?\n");
+                            response.append("A) Coqbul\n");
+                            response.append("B) LockeBurger\n");
+                            response.append("C) SuperMacs\n\n");
+                            response.append("Type 'solve A', 'solve B', or 'solve C'\n");
+                            
+                        } else if (puzzleQuestion == 2) {
+                            // Question 2 answer (correct: B)
+                            if (answer.equals("B")) {
+                                correctAnswers++;
+                                response.append("✓ Correct! LockeBurger is ridiculously expensive!\n\n");
+                            } else {
+                                response.append("✗ Wrong!\n\n");
+                            }
+                            puzzleQuestion = 3;
+                            response.append("QUESTION 3: Who has the CHEAPEST burger?\n");
+                            response.append("A) Some Dodgey Chipper\n");
+                            response.append("B) SuperMacs\n");
+                            response.append("C) Chicken Hut\n\n");
+                            response.append("Type 'solve A', 'solve B', or 'solve C'\n");
+                            
+                        } else if (puzzleQuestion == 3) {
+                            // Question 3 answer (correct: A)
+                            if (answer.equals("A")) {
+                                correctAnswers++;
+                                response.append("✓ Correct! Remember that hint...\n\n");
+                            } else {
+                                response.append("✗ Wrong!\n\n");
+                            }
+                            
+                            // Check if passed
+                            if (correctAnswers == 3) {
+                                secretRoomUnlocked = true;
+                                response.append("=== YOU PASSED! ===\n");
+                                response.append("The Manager smiles and snaps their fingers...\n");
+                                response.append("*** The floor rumbles... ***\n");
+                                response.append("*** A secret passage opens below! ***\n");
+                                response.append("*** Type 'go south' to enter the secret storage! ***\n");
+                            } else {
+                                energyLevel -= 5;
+                                response.append("=== ATTEMPT FAILED ===\n");
+                                response.append("You got ").append(correctAnswers).append(" out of 3 correct.\n");
+                                response.append("You lost 5 energy from stress!\n");
+                                response.append("[Energy: ").append(energyLevel).append("/50]\n");
+                            }
+                            puzzleQuestion = 0; // Reset puzzle
+                        }
+                    } else {
+                        response.append("Please provide an answer: solve A, solve B, or solve C\n");
+                    }
+                }
+                break;
+
+            case "use":
+                if (player.hasItem("Coupon")) {
+                    if (player.getCurrentRoom().getDescription().contains("Some Dodgey Chipper")) {
+                        response.append("YOU WON! Used the GOLDEN COUPON!\n");
+                        System.exit(0);
+                    } else {
+                        response.append("Use COUPON at Some Dodgey Chipper!\n");
+                    }
+                } else {
+                    response.append("You don't have a coupon!\n");
+                }
+                break;
+
+            case "look":
+                response.append(player.getCurrentRoom().getLongDescription()).append("\n");
+                break;
+
+            case "save":
+                if (command.hasSecondWord()) {
+                    SaveGame.saveGame(command.getSecondWord() + ".sav", this);
+                    response.append("Saved to ").append(command.getSecondWord()).append(".sav\n");
+                } else {
+                    response.append("Usage: save <filename>\n");
+                }
+                break;
+
+            case "quit":
+                response.append("Thanks for playing!\n");
+                System.exit(0);
+                break;
+
+            default:
+                response.append("I don't know what you mean...\n");
+                break;
+        }
+        return response.toString();
     }
 }

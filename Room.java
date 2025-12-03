@@ -26,12 +26,13 @@ public class Room implements Serializable {
         foodMenuPrices.put(number, price);
     }
     //learn
-    public void DisplayMenu() {
-        System.out.println("Available options:");
+    public String DisplayMenu() {
+        StringBuilder menu = new StringBuilder("Available options:\n");
         for (Integer num : foodMenuNames.keySet()) {
-            System.out.println(num + ". " + foodMenuNames.get(num) + " - £" + foodMenuPrices.get(num));
+            menu.append(num).append(". ").append(foodMenuNames.get(num)).append(" - £").append(foodMenuPrices.get(num)).append("\n");
         }
-        System.out.println("3. Back (Exit Menu)"); 
+        menu.append("3. Back (Exit Menu)");
+        return menu.toString();
     }
 
     public PurchaseResult orderItem(double balance, int choiceNumber, int hungerLevel) {
