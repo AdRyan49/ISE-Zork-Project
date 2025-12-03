@@ -27,7 +27,12 @@ public class Character implements Serializable {
     }
 
     public void move(String direction) {
-        Room nextRoom = currentRoom.getExit(direction);
+        Direction dir = Direction.fromString(direction);
+        if (dir == null) {
+            System.out.println("Invalid direction!");
+            return;
+        }
+        Room nextRoom = currentRoom.getExit(dir);
         if (nextRoom != null) {
             currentRoom = nextRoom;
             System.out.println("You moved to: " + currentRoom.getDescription());
@@ -100,12 +105,13 @@ public class Character implements Serializable {
      * return true if item was taken successfully, false otherwise
      */
     public boolean takeItem(Room room, String itemName) {
-        Item item = room.removeItem(itemName);
-        if (item != null) {
+        try {
+            Item item = room.removeItem(itemName);
             this.addItem(item);
             return true;
+        } catch (ItemNotFoundException e) {
+            return false;
         }
-        return false;
     }
 
     // NEW: Drop an item from inventory to a room

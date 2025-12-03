@@ -6,7 +6,7 @@ import java.io.Serializable;
 public class Room implements Serializable {
     private static final long serialVersionUID = 1L;
     private String description;
-    private Map<String, Room> exits; // Map direction to neighboring Room
+    private Map<Direction, Room> exits; // Map direction to neighboring Room
     private ArrayList<Item> items; // items
     private Map<Integer, String> foodMenuNames; // map of names
     private Map<Integer, Double> foodMenuPrices;// map of prices
@@ -35,14 +35,13 @@ public class Room implements Serializable {
         return menu.toString();
     }
 
-    public PurchaseResult orderItem(double balance, int choiceNumber, int hungerLevel) {
+    public PurchaseResult orderItem(double balance, int choiceNumber, int hungerLevel) throws InsufficientBalanceException {
         if (foodMenuNames.containsKey(choiceNumber)) {
             String itemName = foodMenuNames.get(choiceNumber);
             Double price = foodMenuPrices.get(choiceNumber);
             System.out.println("You ordered: " + itemName + " for £" + price);
             if (balance < price) {
-                System.out.println("Insufficient balance to complete the purchase.");
-                return new PurchaseResult(hungerLevel, balance); // No change
+                throw new InsufficientBalanceException("You need £" + price + " but only have £" + balance);
             }
             balance = balance - price;
 
@@ -63,18 +62,18 @@ public class Room implements Serializable {
         return description;
     }
 
-    public void setExit(String direction, Room neighbor) {
+    public void setExit(Direction direction, Room neighbor) {
         exits.put(direction, neighbor);
     }
 
-    public Room getExit(String direction) {
+    public Room getExit(Direction direction) {
         return exits.get(direction);
     }
 
     public String getExitString() {
         StringBuilder sb = new StringBuilder();
-        for (String direction : exits.keySet()) {
-            sb.append(direction).append(" ");
+        for (Direction direction : exits.keySet()) {
+            sb.append(direction.getText()).append(" ");
         }
         return sb.toString().trim();
     }
@@ -90,16 +89,17 @@ public class Room implements Serializable {
     /**
      * Removes an item from this room by name
      * param itemName The name of the item to remove
-     * return The removed item, or null if not found
+     * return The removed item
+     * throws ItemNotFoundException if item not found
      */
-    public Item removeItem(String itemName) {
+    public Item removeItem(String itemName) throws ItemNotFoundException {
         for (Item item : items) {
             if (item.getName().equalsIgnoreCase(itemName)) {
                 items.remove(item);
                 return item;
             }
         }
-        return null; // Item not found
+        throw new ItemNotFoundException("Item '" + itemName + "' not found in this room.");
     }
 
     /**

@@ -10,7 +10,7 @@ public class SwingGameUIWithImages extends JFrame {
     private ZorkULGame game;
     private Parser parser;
 
-    public SwingGameUIWithImages() {
+    public SwingGameUIWithImages(ZorkULGame existingGame) {
         setTitle("Restaurant Run - Text Adventure");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
@@ -104,7 +104,7 @@ public class SwingGameUIWithImages extends JFrame {
         westBtn.addActionListener(e -> executeDirection("west"));
 
         // Initialize game
-        game = new ZorkULGame();
+        game = existingGame;
         parser = new Parser();
         outputArea.append("Welcome to Restaurant Run!\n");
         outputArea.append(game.getWelcomeMessage() + "\n\n");
@@ -167,6 +167,6 @@ public class SwingGameUIWithImages extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new SwingGameUIWithImages());
+        SwingUtilities.invokeLater(() -> new SwingGameUIWithImages(new ZorkULGame()));
     }
 }

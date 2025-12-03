@@ -1,9 +1,12 @@
 import java.util.Scanner;
+import javax.swing.SwingUtilities;
 
 public class ZorkUL {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ZorkULGame game;
+  
+
         
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║   Welcome to Restaurant Run!       ║");
@@ -31,6 +34,20 @@ public class ZorkUL {
             game = new ZorkULGame();
         }
         
-        game.play();
+        System.out.println("\nChoose game mode:");
+        System.out.println("1) Text-based (console)");
+        System.out.println("2) Graphical (Swing GUI)");
+        System.out.print("Choose (1 or 2): ");
+        String uiChoice = scanner.nextLine().trim();
+
+        if (uiChoice.equals("2")) {
+            // Launch Swing GUI with loaded or new game
+            scanner.close();
+            final ZorkULGame finalGame = game;
+            SwingUtilities.invokeLater(() -> new SwingGameUIWithImages(finalGame));
+        } else {
+            // Launch text-based game
+            game.play();
+        }
     }
 }

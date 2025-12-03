@@ -120,38 +120,38 @@ public class ZorkULGame implements Serializable {
         brownThomas.addNPC(brownThomasFan);
 
         // initialise room exits
-        outside.setExit("east", Coqbul);
-        outside.setExit("south", lockeBurger);
-        outside.setExit("west", SuperMacs);
-        outside.setExit("north", brownThomas);
+        outside.setExit(Direction.EAST, Coqbul);
+        outside.setExit(Direction.SOUTH, lockeBurger);
+        outside.setExit(Direction.WEST, SuperMacs);
+        outside.setExit(Direction.NORTH, brownThomas);
 
-        Coqbul.setExit("west", outside);
-        Coqbul.setExit("east", SomeDodgeyChipper);
+        Coqbul.setExit(Direction.WEST, outside);
+        Coqbul.setExit(Direction.EAST, SomeDodgeyChipper);
 
-        brownThomas.setExit("south", outside);
-        brownThomas.setExit("north", studentUnion);
+        brownThomas.setExit(Direction.SOUTH, outside);
+        brownThomas.setExit(Direction.NORTH, studentUnion);
 
-        studentUnion.setExit("south", brownThomas);
+        studentUnion.setExit(Direction.SOUTH, brownThomas);
 
-        SuperMacs.setExit("east", outside);
-        SuperMacs.setExit("south", ChickenHut);
+        SuperMacs.setExit(Direction.EAST, outside);
+        SuperMacs.setExit(Direction.SOUTH, ChickenHut);
 
-        ChickenHut.setExit("north", SuperMacs);
-        ChickenHut.setExit("east", lockeBurger);
+        ChickenHut.setExit(Direction.NORTH, SuperMacs);
+        ChickenHut.setExit(Direction.EAST, lockeBurger);
 
-        lockeBurger.setExit("west", ChickenHut);
+        lockeBurger.setExit(Direction.WEST, ChickenHut);
 
-        lockeBurger.setExit("north", outside);
-        lockeBurger.setExit("east", burgerMac);
-        lockeBurger.setExit("south", secretStorage);
+        lockeBurger.setExit(Direction.NORTH, outside);
+        lockeBurger.setExit(Direction.EAST, burgerMac);
+        lockeBurger.setExit(Direction.SOUTH, secretStorage);
 
-        secretStorage.setExit("north", lockeBurger);
+        secretStorage.setExit(Direction.NORTH, lockeBurger);
 
-        burgerMac.setExit("west", lockeBurger);
-        burgerMac.setExit("north", SomeDodgeyChipper);
+        burgerMac.setExit(Direction.WEST, lockeBurger);
+        burgerMac.setExit(Direction.NORTH, SomeDodgeyChipper);
 
-        SomeDodgeyChipper.setExit("west", Coqbul);
-        SomeDodgeyChipper.setExit("south", burgerMac);
+        SomeDodgeyChipper.setExit(Direction.WEST, Coqbul);
+        SomeDodgeyChipper.setExit(Direction.SOUTH, burgerMac);
 
         // create the player character and start outside
         player = new Character("player", outside);
@@ -219,19 +219,6 @@ public class ZorkULGame implements Serializable {
                 }
                 break;
 
-            case "drop": // Handle drop command
-                if (command.hasSecondWord()) {
-                    String itemName = command.getSecondWord();
-                    if (player.dropItem(player.getCurrentRoom(), itemName)) {
-                        System.out.println("You dropped: " + itemName);
-                    } else {
-                        System.out.println("You don't have that item!");
-                    }
-                } else {
-                    System.out.println("Drop what?");
-                }
-                break;
-
             case "inventory": // Handle inventory command
                 System.out.println(player.getInventoryString());
                 break;
@@ -246,10 +233,14 @@ public class ZorkULGame implements Serializable {
                     System.out.println("Exiting menu.");
                     break;
                 }
-                PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
-                hungerLevel = result.hungerLevel;
-                // player.displayHungerBar(hungerLevel);
-                balance = result.balance;
+                try {
+                    PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
+                    hungerLevel = result.hungerLevel;
+                    // player.displayHungerBar(hungerLevel);
+                    balance = result.balance;
+                } catch (InsufficientBalanceException e) {
+                    System.out.println("ERROR: " + e.getMessage());
+                }
 
                 break;
             case "talk":
@@ -506,10 +497,16 @@ public class ZorkULGame implements Serializable {
             return;
         }
 
-        String direction = command.getSecondWord();
+        String directionText = command.getSecondWord();
+        Direction direction = Direction.fromString(directionText);
+        
+        if (direction == null) {
+            System.out.println("Invalid direction!");
+            return;
+        }
 
         // Block south from LockeBurger until puzzle solved
-        if (direction.equalsIgnoreCase("south") &&
+        if (directionText.equalsIgnoreCase("south") &&
                 player.getCurrentRoom().getDescription().contains("LockeBurger") &&
                 !secretRoomUnlocked) {
             System.out.println("A mysterious lock blocks the passage south.");
@@ -557,15 +554,19 @@ public class ZorkULGame implements Serializable {
 
         switch (commandWord) {
             case "help":
-                response.append("Commands: go, take, drop, inventory, menu, talk, solve, use, look, save, quit\n");
+                response.append("Commands: go, take, inventory, menu, talk, solve, use, look, save, quit\n");
                 break;
 
             case "go":
                 if (!command.hasSecondWord()) {
                     response.append("Go where?\n");
                 } else {
-                    String direction = command.getSecondWord();
-                    if (direction.equalsIgnoreCase("south") && player.getCurrentRoom().getDescription().contains("LockeBurger") && !secretRoomUnlocked) {
+                    String directionText = command.getSecondWord();
+                    Direction direction = Direction.fromString(directionText);
+                    
+                    if (direction == null) {
+                        response.append("Invalid direction!\n");
+                    } else if (directionText.equalsIgnoreCase("south") && player.getCurrentRoom().getDescription().contains("LockeBurger") && !secretRoomUnlocked) {
                         response.append("A mysterious lock blocks the passage south.\n");
                     } else {
                         Room nextRoom = player.getCurrentRoom().getExit(direction);
@@ -595,18 +596,6 @@ public class ZorkULGame implements Serializable {
                 }
                 break;
 
-            case "drop":
-                if (command.hasSecondWord()) {
-                    if (player.dropItem(player.getCurrentRoom(), command.getSecondWord())) {
-                        response.append("You dropped: ").append(command.getSecondWord()).append("\n");
-                    } else {
-                        response.append("You don't have that item!\n");
-                    }
-                } else {
-                    response.append("Drop what?\n");
-                }
-                break;
-
             case "inventory":
                 response.append(player.getInventoryString()).append("\n");
                 break;
@@ -617,10 +606,14 @@ public class ZorkULGame implements Serializable {
                     if (input == 3) {
                         response.append("Exiting menu.\n");
                     } else {
-                        PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
-                        hungerLevel = result.hungerLevel;
-                        balance = result.balance;
-                        response.append(result.toString()).append("\n");
+                        try {
+                            PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
+                            hungerLevel = result.hungerLevel;
+                            balance = result.balance;
+                            response.append(result.toString()).append("\n");
+                        } catch (InsufficientBalanceException e) {
+                            response.append("ERROR: ").append(e.getMessage()).append("\n");
+                        }
                     }
                 } else {
                     response.append(player.getCurrentRoom().DisplayMenu()).append("\nBalance: £").append(balance).append("\nType 'menu 1' or 'menu 2'\n");
