@@ -16,6 +16,9 @@ emphasizing exploration and simple command-driven gameplay
 import java.io.Serializable;
 import java.security.Key;
 import java.util.Scanner;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ZorkULGame implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -156,6 +159,49 @@ public class ZorkULGame implements Serializable {
         // create the player character and start outside
         player = new Character("player", outside);
     }
+
+    // Auto-generate help text using reflection
+    private String getAnnotatedCommands() {
+        StringBuilder help = new StringBuilder("Available commands:\n");
+        Method[] methods = this.getClass().getDeclaredMethods();
+        
+        for (Method method : methods) {
+            if (method.isAnnotationPresent(GameCommand.class)) {
+                GameCommand annotation = method.getAnnotation(GameCommand.class);
+                help.append("  ").append(annotation.word())
+                    .append(" - ").append(annotation.description()).append("\n");
+            }
+        }
+        return help.toString();
+    }
+
+    // Command documentation methods (used by reflection for help text)
+    @GameCommand(word = "take", description = "Pick up an item")
+    private void cmdTake() {}
+    
+    @GameCommand(word = "inventory", description = "Show your items")
+    private void cmdInventory() {}
+    
+    @GameCommand(word = "menu", description = "Buy food (menu 1, menu 2, etc)")
+    private void cmdMenu() {}
+    
+    @GameCommand(word = "talk", description = "Talk to an NPC")
+    private void cmdTalk() {}
+    
+    @GameCommand(word = "solve", description = "Answer puzzle questions")
+    private void cmdSolve() {}
+    
+    @GameCommand(word = "use", description = "Use an item")
+    private void cmdUse() {}
+    
+    @GameCommand(word = "look", description = "Look around the room")
+    private void cmdLook() {}
+    
+    @GameCommand(word = "save", description = "Save your game")
+    private void cmdSave() {}
+    
+    @GameCommand(word = "quit", description = "Exit the game")
+    private void cmdQuit() {}
 
     public void play() {
         printWelcome();
@@ -484,13 +530,14 @@ public class ZorkULGame implements Serializable {
     // System.out.println("["+bar+"]");
     // }
 
+    @GameCommand(word = "help", description = "Display available commands")
     private void printHelp() {
         System.out.println("You are lost. You are alone. You wander around the university.");
-        System.out.print("Your command words are: ");
-        parser.showCommands();
+        System.out.println(getAnnotatedCommands());
         System.out.println(moveCount);
     }
 
+    @GameCommand(word = "go", description = "Move in a direction (north/south/east/west)")
     private void goRoom(Command command) {
         if (!command.hasSecondWord()) {
             System.out.println("Go where?");
@@ -554,7 +601,7 @@ public class ZorkULGame implements Serializable {
 
         switch (commandWord) {
             case "help":
-                response.append("Commands: go, take, inventory, menu, talk, solve, use, look, save, quit\n");
+                response.append(getAnnotatedCommands());
                 break;
 
             case "go":
