@@ -739,9 +739,9 @@ public class ZorkULGame implements Serializable {
                             // Question 1 answer (correct: A)
                             if (answer.equals("A")) {
                                 correctAnswers++;
-                                response.append("✓ Correct! A legendary curse indeed!\n\n");
+                                response.append(" Correct! A legendary curse indeed!\n\n");
                             } else {
-                                response.append("✗ Wrong!\n\n");
+                                response.append(" Wrong!\n\n");
                             }
                             puzzleQuestion = 2;
                             response.append("QUESTION 2: Which restaurant is the MOST EXPENSIVE?\n");
@@ -754,9 +754,9 @@ public class ZorkULGame implements Serializable {
                             // Question 2 answer (correct: B)
                             if (answer.equals("B")) {
                                 correctAnswers++;
-                                response.append("✓ Correct! LockeBurger is ridiculously expensive!\n\n");
+                                response.append(" Correct! LockeBurger is ridiculously expensive!\n\n");
                             } else {
-                                response.append("✗ Wrong!\n\n");
+                                response.append(" Wrong!\n\n");
                             }
                             puzzleQuestion = 3;
                             response.append("QUESTION 3: Who has the CHEAPEST burger?\n");
@@ -769,9 +769,9 @@ public class ZorkULGame implements Serializable {
                             // Question 3 answer (correct: A)
                             if (answer.equals("A")) {
                                 correctAnswers++;
-                                response.append("✓ Correct! Remember that hint...\n\n");
+                                response.append(" Correct! Remember that hint...\n\n");
                             } else {
-                                response.append("✗ Wrong!\n\n");
+                                response.append(" Wrong!\n\n");
                             }
                             
                             // Check if passed
