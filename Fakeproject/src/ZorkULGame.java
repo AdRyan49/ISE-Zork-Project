@@ -50,7 +50,7 @@ public class ZorkULGame implements Serializable {
         moveCount = 0;
         energyLevel = 50;
         hungerLevel = 50;
-        balance = 100.0;
+        balance = 50.0;
 
     }
 
