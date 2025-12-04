@@ -652,7 +652,6 @@ public class ZorkULGame implements Serializable {
                             PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
                             hungerLevel = result.hungerLevel;
                             balance = result.balance;
-                            response.append(result.toString()).append("\n");
                         } catch (InsufficientBalanceException e) {
                             response.append("ERROR: ").append(e.getMessage()).append("\n");
                         }
