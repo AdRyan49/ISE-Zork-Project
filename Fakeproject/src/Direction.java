@@ -1,4 +1,4 @@
-
+package Fakeproject.src;
 public enum Direction {
     // all possible movement directions in the game
     NORTH("north"),

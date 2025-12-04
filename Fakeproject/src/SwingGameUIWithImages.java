@@ -1,4 +1,4 @@
-
+package Fakeproject.src;
 
 import javax.swing.*;
 import java.awt.*;

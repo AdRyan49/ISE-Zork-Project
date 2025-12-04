@@ -1,4 +1,4 @@
-
+package Fakeproject.src;
 
 import java.util.Scanner;
 import java.io.Serializable;

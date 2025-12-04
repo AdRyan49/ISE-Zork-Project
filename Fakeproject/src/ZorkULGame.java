@@ -1,4 +1,4 @@
-
+package Fakeproject.src;
 /* This game is a classic text-based adventure set in a university environment.
    The player starts outside the main entrance and can navigate through different rooms like a 
    lecture Coqbul, campus SuperMacs, computing lockeBurger, and admin burgerMac using simple text commands (e.g., "go east", "go west").
