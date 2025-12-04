@@ -7,6 +7,7 @@ public class CommandWords implements Serializable {
     private Map<String, String> validCommands;
 
     public CommandWords() {
+        // register all valid game commands
         validCommands = new HashMap<>();
         validCommands.put("go", "Move to another room");
         validCommands.put("quit", "End the game");

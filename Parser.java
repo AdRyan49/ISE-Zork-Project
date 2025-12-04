@@ -7,21 +7,23 @@ public class Parser implements Serializable {
     private transient Scanner reader;
 
     public Parser() {
+        // setup command recognition and input reader
         commands = new CommandWords();
         reader = new Scanner(System.in);
     }
 
-    // Reinitialize scanner after deserialization
+    // scanner can't be serialized, so reinitialize it after loading a save
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         reader = new Scanner(System.in);
     }
-
     public Command getCommand() {
         System.out.print("> ");
         String inputLine = reader.nextLine();
 
+        // split input into command word and second word
         String word1 = null;
+        String word2 = null;
         String word2 = null;
 
         Scanner tokenizer = new Scanner(inputLine);
@@ -39,11 +41,11 @@ public class Parser implements Serializable {
         }
     }
 
-    public void showCommands() {
         commands.showAll();
     }
 
-    // NEW METHOD FOR GUI
+    // parse commands from GUI text input
+    public Command parseCommand(String inputLine) {
     public Command parseCommand(String inputLine) {
         String word1 = null;
         String word2 = null;

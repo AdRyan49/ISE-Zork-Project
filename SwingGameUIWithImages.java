@@ -11,16 +11,16 @@ public class SwingGameUIWithImages extends JFrame {
     private Parser parser;
 
     public SwingGameUIWithImages(ZorkULGame existingGame) {
+        // setup main window
         setTitle("Restaurant Run - Text Adventure");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
         setLocationRelativeTo(null);
 
-        // Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBackground(new Color(45, 45, 48));
 
-        // LEFT: Image panel
+        // left side: room image
         JPanel imagePanel = new JPanel(new BorderLayout());
         imagePanel.setBackground(new Color(45, 45, 48));
         imagePanel.setPreferredSize(new Dimension(500, 400));
@@ -33,7 +33,7 @@ public class SwingGameUIWithImages extends JFrame {
         imagePanel.add(imageLabel, BorderLayout.CENTER);
         mainPanel.add(imagePanel, BorderLayout.WEST);
 
-        // RIGHT: Text output
+        // right side: text output
         outputArea = new JTextArea();
         outputArea.setEditable(false);
         outputArea.setLineWrap(true);
@@ -46,11 +46,9 @@ public class SwingGameUIWithImages extends JFrame {
         scrollPane.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 75)));
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // BOTTOM: Input and buttons
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(45, 45, 48));
         
-        // Input field and send button
         JPanel inputPanel = new JPanel(new BorderLayout());
         inputPanel.setBackground(new Color(45, 45, 48));
         inputField = new JTextField();
@@ -69,7 +67,6 @@ public class SwingGameUIWithImages extends JFrame {
         inputPanel.add(inputField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
         
-        // Direction buttons
         JPanel buttonPanel = new JPanel(new GridLayout(1, 4, 5, 5));
         buttonPanel.setBackground(new Color(45, 45, 48));
         JButton northBtn = new JButton("NORTH");
@@ -77,6 +74,7 @@ public class SwingGameUIWithImages extends JFrame {
         JButton eastBtn = new JButton("EAST");
         JButton westBtn = new JButton("WEST");
         
+        // style all direction buttons the same way
         for (JButton btn : new JButton[]{northBtn, southBtn, eastBtn, westBtn}) {
             btn.setBackground(new Color(60, 60, 65));
             btn.setForeground(Color.WHITE);
@@ -95,7 +93,7 @@ public class SwingGameUIWithImages extends JFrame {
 
         add(mainPanel);
 
-        // Event listeners
+        // wire up buttons to their actions
         sendButton.addActionListener(e -> processCommand());
         inputField.addActionListener(e -> processCommand());
         northBtn.addActionListener(e -> executeDirection("north"));
@@ -103,7 +101,7 @@ public class SwingGameUIWithImages extends JFrame {
         eastBtn.addActionListener(e -> executeDirection("east"));
         westBtn.addActionListener(e -> executeDirection("west"));
 
-        // Initialize game
+        // start the game with welcome msg
         game = existingGame;
         parser = new Parser();
         outputArea.append("Welcome to Restaurant Run!\n");
@@ -114,6 +112,7 @@ public class SwingGameUIWithImages extends JFrame {
         setVisible(true);
     }
 
+    // direction buttons auto-fill the input field
     private void executeDirection(String direction) {
         inputField.setText("go " + direction);
         processCommand();
@@ -123,19 +122,21 @@ public class SwingGameUIWithImages extends JFrame {
         String input = inputField.getText().trim();
         if (input.isEmpty()) return;
 
+        // echo command, run it, display response
         outputArea.append("> " + input + "\n");
         Command command = parser.parseCommand(input);
         String response = game.executeCommand(command);
         outputArea.append(response + "\n");
         updateRoomImage();
         inputField.setText("");
-        outputArea.setCaretPosition(outputArea.getDocument().getLength());
+        outputArea.setCaretPosition(outputArea.getDocument().getLength()); // auto-scroll to bottom
     }
 
     private void updateRoomImage() {
         String desc = game.getCurrentRoomDescription().toLowerCase();
         String imageName = "";
 
+        // map room descriptions to image files
         if (desc.contains("outide") || desc.contains("outside")) imageName = "images/Outside.png";
         else if (desc.contains("coqbul")) imageName = "images/coqbul.png";
         else if (desc.contains("supermacs")) imageName = "images/Supermacs.png";
@@ -147,6 +148,7 @@ public class SwingGameUIWithImages extends JFrame {
         else if (desc.contains("storage") || desc.contains("secret")) imageName = "images/Secretroom.png";
         else if (desc.contains("brown thomas")) imageName = "images/brownthomas.png";
 
+        // load and scale the image if found
         if (!imageName.isEmpty()) {
             try {
                 File imgFile = new File(imageName);

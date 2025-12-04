@@ -93,10 +93,9 @@ public class Room implements Serializable {
      * throws ItemNotFoundException if item not found
      */
     public Item removeItem(String itemName) throws ItemNotFoundException {
-        for (Item item : items) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                items.remove(item);
-                return item;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getName().equalsIgnoreCase(itemName)) {
+                return items.remove(i);
             }
         }
         throw new ItemNotFoundException("Item '" + itemName + "' not found in this room.");

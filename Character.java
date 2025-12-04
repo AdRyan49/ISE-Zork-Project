@@ -5,12 +5,12 @@ public class Character implements Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private Room currentRoom;
-    private ArrayList<Item> inventory; // NEW: Player's inventory
+    private ArrayList<Item> inventory;
 
     public Character(String name, Room startingRoom) {
         this.name = name;
         this.currentRoom = startingRoom;
-        this.inventory = new ArrayList<>(); // NEW: Initialize empty inventory
+        this.inventory = new ArrayList<>();
 
     }
 
@@ -41,37 +41,19 @@ public class Character implements Serializable {
         }
     }
 
-    // NEW: Add item to inventory
-    /**
-     * Adds an item to the character's inventory
-     * param item The item to add
-     */
     public void addItem(Item item) {
         inventory.add(item);
     }
 
-    // NEW: Remove item from inventory
-    /**
-     * Removes an item from inventory by name
-     * param itemName The name of the item to remove
-     * return The removed item, or null if not found
-     */
     public Item removeItem(String itemName) {
-        for (Item item : inventory) {
-            if (item.getName().equalsIgnoreCase(itemName)) {
-                inventory.remove(item);
-                return item;
+        for (int i = 0; i < inventory.size(); i++) {
+            if (inventory.get(i).getName().equalsIgnoreCase(itemName)) {
+                return inventory.remove(i);
             }
         }
         return null;
     }
 
-    // NEW: Check if inventory has an item
-    /**
-     * Checks if the character has an item
-     * param itemName The name of the item to check for
-     * return true if item is in inventory, false otherwise
-     */
     public boolean hasItem(String itemName) {
         for (Item item : inventory) {
             if (item.getName().equalsIgnoreCase(itemName)) {
@@ -81,11 +63,6 @@ public class Character implements Serializable {
         return false;
     }
 
-    // NEW: Get inventory as string
-    /**
-     * Returns a formatted string of all items in inventory
-     * return String listing all items with details
-     */
     public String getInventoryString() {
         if (inventory.isEmpty()) {
             return "Your inventory is empty.";
@@ -97,13 +74,6 @@ public class Character implements Serializable {
         return sb.toString();
     }
 
-    // NEW: Take an item from a room and add to inventory
-    /**
-     * Takes an item from a specific room and adds it to inventory
-     * param room The room to take the item from
-     * param itemName The name of the item to take
-     * return true if item was taken successfully, false otherwise
-     */
     public boolean takeItem(Room room, String itemName) {
         try {
             Item item = room.removeItem(itemName);
@@ -112,22 +82,6 @@ public class Character implements Serializable {
         } catch (ItemNotFoundException e) {
             return false;
         }
-    }
-
-    // NEW: Drop an item from inventory to a room
-    /**
-     * Drops an item from inventory into a specific room
-     * room The room to drop the item into
-     * itemName The name of the item to drop
-     * return true if item was dropped successfully, false otherwise
-     */
-    public boolean dropItem(Room room, String itemName) {
-        Item item = this.removeItem(itemName);
-        if (item != null) {
-            room.addItem(item);
-            return true;
-        }
-        return false;
     }
 
     public void displayEnergyBar(int energyLevel) {

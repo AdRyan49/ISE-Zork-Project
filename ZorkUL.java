@@ -7,7 +7,7 @@ public class ZorkUL {
         ZorkULGame game;
   
 
-        
+        // show welcome and let player choose new/load
         System.out.println("╔════════════════════════════════════╗");
         System.out.println("║   Welcome to Restaurant Run!       ║");
         System.out.println("╚════════════════════════════════════╝\n");
@@ -19,6 +19,7 @@ public class ZorkUL {
         String choice = scanner.nextLine().trim();
         
         if (choice.equals("2")) {
+            // try to load saved game
             System.out.println("\nEnter save file name to load (e.g., 'mysave'):");
             String saveName = scanner.nextLine().trim();
             
@@ -29,11 +30,12 @@ public class ZorkUL {
                 game = new ZorkULGame();
             } else {
                 System.out.println("✓ Save loaded! Continuing your adventure...\n");
-            }
         } else {
             game = new ZorkULGame();
         }
         
+        // let player choose text or GUI mode
+        System.out.println("\nChoose game mode:");
         System.out.println("\nChoose game mode:");
         System.out.println("1) Text-based (console)");
         System.out.println("2) Graphical (Swing GUI)");

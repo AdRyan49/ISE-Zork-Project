@@ -1,4 +1,5 @@
 public enum Direction {
+    // all possible movement directions in the game
     NORTH("north"),
     SOUTH("south"),
     EAST("east"),
@@ -14,6 +15,7 @@ public enum Direction {
         return text;
     }
 
+    // convert user input like "north" into Direction.NORTH
     public static Direction fromString(String text) {
         if (text == null) return null;
         for (Direction dir : Direction.values()) {

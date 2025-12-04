@@ -28,33 +28,37 @@ public class ZorkULGame implements Serializable {
     private int energyLevel;
     private int hungerLevel;
     private double balance;
+    
+    // clue progression tracking
     private int cluesFound = 0;
     private boolean puzzleAvailable = false;
     private boolean secretRoomUnlocked = false;
     private boolean couponActive = false;
-    private boolean clue1Talked = false; // Talked to Student
-    private boolean clue2Talked = false; // Talked to Cook
-    private boolean clue3Talked = false; // Talked to Statue
-    private boolean clue4Talked = false; // Talked to Manager
-    private boolean clue5Talked = false; // Talked to Mysterious Figure
-    private int puzzleQuestion = 0; // Track which question (0=not started, 1-3=questions)
-    private int correctAnswers = 0; // Track correct answers
+    // npcs only talk if you've spoken to the previous one in the chain
+    private boolean clue1Talked = false;
+    private boolean clue2Talked = false;
+    private boolean clue3Talked = false;
+    private boolean clue4Talked = false;
+    private boolean clue5Talked = false;
+    private int puzzleQuestion = 0; // tracks which question we're on (0=not started, 1-3)
+    private int correctAnswers = 0;
 
     public ZorkULGame() {
+        // setup game world and starting stats
         createRooms();
         parser = new Parser();
         moveCount = 0;
         energyLevel = 50;
-        hungerLevel = 50; // initial hunger level
+        hungerLevel = 50;
         balance = 100.0;
 
     }
 
     private void createRooms() {
+        // declare all the rooms
         Room outside, Coqbul, SuperMacs, lockeBurger, burgerMac, SomeDodgeyChipper, brownThomas, studentUnion,
                 ChickenHut, secretStorage;
 
-        // create rooms
         outside = new Room("Your outide, the restaurants are waiting to serve you.");
         Coqbul = new Room("Welcome to Coqbul some succulent food in this place.");
         SuperMacs = new Room("Inside SuperMacs Diner. The fries here are almost as salty as the staff's jokes.");
@@ -68,8 +72,8 @@ public class ZorkULGame implements Serializable {
                 "Welcome to chicken hut with sticky tables and flickering lights. The food is cheap for a reason.");
         secretStorage = new Room(
                 "A dusty storage room that smells of old cardboard and forgotten dreams. In the corner, a GOLDEN COUPON glows softly!");
-        // Set up food menus for each room
 
+        // setup food menus for each restaurant
         outside.addMenuOption(1, "Cheeseburger", 5.99);
         outside.addMenuOption(2, "Veggie Burger", 4.49);
 
@@ -91,14 +95,12 @@ public class ZorkULGame implements Serializable {
         ChickenHut.addMenuOption(1, "Fried Chicken Burger", 5.99);
         ChickenHut.addMenuOption(2, "Spicy Wings Combo", 6.49);
 
-        // Creat items
+        // winning item hidden in secret room
         Item coupon = new Item("Coupon", "The key to winning make sure to use it wisely!");
 
-        // Place items
         secretStorage.addItem(coupon);
 
-        // add npcs
-
+        // each npc gives a clue to find the next one
         NPC student = new NPC("Student",
                 "Well lad You look broke like me. Want the CHEAPEST burger on campus? I don't know where it is, but the COOK at SuperMacs might. He's always complaining about competition. I'm to scared to talk to him, can you?");
         studentUnion.addNPC(student);
@@ -122,7 +124,7 @@ public class ZorkULGame implements Serializable {
                 "Did you hear about the curse of Brown Thomas? They say if you touch it, you fail your exams?");
         brownThomas.addNPC(brownThomasFan);
 
-        // initialise room exits
+        // connect all the rooms
         outside.setExit(Direction.EAST, Coqbul);
         outside.setExit(Direction.SOUTH, lockeBurger);
         outside.setExit(Direction.WEST, SuperMacs);
@@ -156,11 +158,11 @@ public class ZorkULGame implements Serializable {
         SomeDodgeyChipper.setExit(Direction.WEST, Coqbul);
         SomeDodgeyChipper.setExit(Direction.SOUTH, burgerMac);
 
-        // create the player character and start outside
+        // player starts outside
         player = new Character("player", outside);
     }
 
-    // Auto-generate help text using reflection
+    // use reflection to build help text from annotations
     private String getAnnotatedCommands() {
         StringBuilder help = new StringBuilder("Available commands:\n");
         Method[] methods = this.getClass().getDeclaredMethods();
@@ -175,7 +177,6 @@ public class ZorkULGame implements Serializable {
         return help.toString();
     }
 
-    // Command documentation methods (used by reflection for help text)
     @GameCommand(word = "take", description = "Pick up an item")
     private void cmdTake() {}
     
@@ -206,6 +207,7 @@ public class ZorkULGame implements Serializable {
     public void play() {
         printWelcome();
 
+        // main game loop
         boolean finished = false;
         while (!finished) {
 
@@ -231,10 +233,10 @@ public class ZorkULGame implements Serializable {
             System.out.println("I don't understand your command...");
             return false;
         }
-        // check for game over conditions
+        // game over if you run out of energy or hunger
         if (energyLevel <= 0 || hungerLevel <= 0) {
             System.out.println("You have run out of juice and DIED. better luck next time!");
-            return true; // End the game
+            return true;
         }
         switch (commandWord) {
             case "help":
@@ -242,17 +244,17 @@ public class ZorkULGame implements Serializable {
                 break;
             case "go":
                 goRoom(command);
+                // moving drains energy and hunger
                 moveCount++;
                 energyLevel = energyLevel - 1;
                 hungerLevel = hungerLevel - 5;
 
-                // use the Character's energy-bar method
                 player.displayEnergyBar(energyLevel);
                 hungerLevel = Math.max(0, hungerLevel);
                 player.displayHungerBar(hungerLevel);
 
                 break;
-            case "take": // Handle take command
+            case "take":
                 if (command.hasSecondWord()) {
                     String itemName = command.getSecondWord();
                     if (player.takeItem(player.getCurrentRoom(), itemName)) {
@@ -265,7 +267,7 @@ public class ZorkULGame implements Serializable {
                 }
                 break;
 
-            case "inventory": // Handle inventory command
+            case "inventory":
                 System.out.println(player.getInventoryString());
                 break;
 
@@ -279,6 +281,7 @@ public class ZorkULGame implements Serializable {
                     System.out.println("Exiting menu.");
                     break;
                 }
+                // try to buy food, might not have enough money
                 try {
                     PurchaseResult result = player.getCurrentRoom().orderItem(balance, input, hungerLevel);
                     hungerLevel = result.hungerLevel;
@@ -295,22 +298,18 @@ public class ZorkULGame implements Serializable {
                     NPC npc = player.getCurrentRoom().getNPC(npcName);
                     if (npc != null) {
                         if (!npc.hasSpoken()) {
-                            // First time talking to this NPC - Check clue progression
-
+                            // npcs have to be talked to in order
                             if (npc.getName().equalsIgnoreCase("Student")) {
-                                // CLUE 1 - Always available (starter)
                                 System.out.println(npc.speak());
                                 clue1Talked = true;
                                 System.out.println("\n[Clue 1/5: Learn about the Cook]");
 
                             } else if (npc.getName().equalsIgnoreCase("Cook")) {
                                 if (clue1Talked) {
-                                    // Player talked to Student first - give info!
                                     System.out.println(npc.speak());
                                     clue2Talked = true;
                                     System.out.println("\n[Clue 2/5: Learn about the Statue]");
                                 } else {
-                                    // Player didn't talk to Student - no info
                                     System.out.println(
                                             "What do you want? I'm busy. Come back after you've done your homework.");
                                     System.out.println("(You need to talk to the Student first)");
@@ -318,12 +317,10 @@ public class ZorkULGame implements Serializable {
 
                             } else if (npc.getName().equalsIgnoreCase("Statue")) {
                                 if (clue2Talked) {
-                                    // Player talked to Cook first - give info!
                                     System.out.println(npc.speak());
                                     clue3Talked = true;
                                     System.out.println("\n[Clue 3/5: Learn about the Manager]");
                                 } else {
-                                    // Player didn't talk to Cook - no info
                                     System.out.println(
                                             "*The statue stands silent, offering no wisdom to those unprepared.*");
                                     System.out.println("(You need to talk to the Cook first)");
@@ -331,7 +328,6 @@ public class ZorkULGame implements Serializable {
 
                             } else if (npc.getName().equalsIgnoreCase("Manager")) {
                                 if (clue3Talked) {
-                                    // Player talked to Statue first - give info!
                                     System.out.println(npc.speak());
                                     clue4Talked = true;
                                     puzzleAvailable = true;
@@ -339,7 +335,6 @@ public class ZorkULGame implements Serializable {
                                     System.out.println("*** The Manager is ready to test you! ***");
                                     System.out.println("*** Type 'solve' to attempt the puzzle! ***\n");
                                 } else {
-                                    // Player didn't talk to Statue - no info
                                     System.out.println(
                                             "I don't have time for random visitors. Come back when you've earned it.");
                                     System.out.println("(You need to talk to the Statue first)");
@@ -348,7 +343,6 @@ public class ZorkULGame implements Serializable {
                             } else if (npc.getName().equalsIgnoreCase("MysteriousFigure")
                                     || npc.getName().equalsIgnoreCase("Mysterious Figure")) {
                                 if (secretRoomUnlocked) {
-                                    // Player solved puzzle first - give final info!
                                     System.out.println(npc.speak());
                                     clue5Talked = true;
                                     System.out.println(
@@ -552,7 +546,7 @@ public class ZorkULGame implements Serializable {
             return;
         }
 
-        // Block south from LockeBurger until puzzle solved
+        // secret room is locked until player solves the puzzle
         if (directionText.equalsIgnoreCase("south") &&
                 player.getCurrentRoom().getDescription().contains("LockeBurger") &&
                 !secretRoomUnlocked) {
@@ -585,6 +579,7 @@ public class ZorkULGame implements Serializable {
         return player.getCurrentRoom().getLongDescription();
     }
 
+    // handle commands from the GUI (similar to processCommand but returns strings)
     public String executeCommand(Command command) {
         StringBuilder response = new StringBuilder();
         String commandWord = command.getCommandWord();
@@ -794,7 +789,7 @@ public class ZorkULGame implements Serializable {
                                 response.append("You lost 5 energy from stress!\n");
                                 response.append("[Energy: ").append(energyLevel).append("/50]\n");
                             }
-                            puzzleQuestion = 0; // Reset puzzle
+                            puzzleQuestion = 0; // reset for next attempt
                         }
                     } else {
                         response.append("Please provide an answer: solve A, solve B, or solve C\n");

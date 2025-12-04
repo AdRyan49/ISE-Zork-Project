@@ -7,6 +7,7 @@ public class NPC implements Serializable {
     private boolean hasSpoken;
 
     public NPC(String name, String dialogue) {
+        // npcs start untalked-to
         this.name = name;
         this.dialogue = dialogue;
         this.hasSpoken = false;
@@ -17,7 +18,7 @@ public class NPC implements Serializable {
     }
 
     public String speak() {
-        hasSpoken = true;
+        hasSpoken = true; // mark as talked to
         return name + " says: \"" + dialogue + "\"";
     }
 
