@@ -30,12 +30,12 @@ public class ZorkUL {
                 game = new ZorkULGame();
             } else {
                 System.out.println("✓ Save loaded! Continuing your adventure...\n");
+            }
         } else {
             game = new ZorkULGame();
         }
         
         // let player choose text or GUI mode
-        System.out.println("\nChoose game mode:");
         System.out.println("\nChoose game mode:");
         System.out.println("1) Text-based (console)");
         System.out.println("2) Graphical (Swing GUI)");

@@ -24,7 +24,6 @@ public class Parser implements Serializable {
         // split input into command word and second word
         String word1 = null;
         String word2 = null;
-        String word2 = null;
 
         Scanner tokenizer = new Scanner(inputLine);
         if (tokenizer.hasNext()) {
@@ -41,11 +40,7 @@ public class Parser implements Serializable {
         }
     }
 
-        commands.showAll();
-    }
-
     // parse commands from GUI text input
-    public Command parseCommand(String inputLine) {
     public Command parseCommand(String inputLine) {
         String word1 = null;
         String word2 = null;
