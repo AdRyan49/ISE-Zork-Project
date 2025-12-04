@@ -1,4 +1,4 @@
-
+package Fakeproject.src;
 import java.io.Serializable;
 
 public class Command implements Serializable {
