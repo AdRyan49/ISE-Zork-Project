@@ -1,0 +1,5 @@
+https://github.com/AdRyan49/ISE-Zork-Project
+
+how to run-
+run this command in terminal
+cd 'FakeProject\Fakeproject'; java -jar app.jar
